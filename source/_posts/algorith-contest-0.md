@@ -1,7 +1,7 @@
 ---
 title: 今天开始，重新学算法啦！
 date: 2019-09-16 15:31:01
-tags: alogrithms
+tags: algorithms
 categories: algorithms
 ---
 
