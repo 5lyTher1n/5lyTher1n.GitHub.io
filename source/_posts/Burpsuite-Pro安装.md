@@ -44,7 +44,7 @@ categories:
 
 之后下载破解补丁。
 
-我是之前从52pojie找到的补丁，然后**好像**找到了 原作者发布的补丁，之后比较了校验和。只记得相对来说应该算是比较可靠的，就用了之前备份的补丁。这里用到的是burp-loader-keygen.jar和burpsuite_pro_v1.7.36.jar.然后把*burpsuite_pro_v1.7.36.jar*改名为 **burpsuite_community_v1.7.36**
+我是之前从52pojie找到的补丁，然后**好像**找到了 原作者发布的补丁，之后比较了校验和。只记得相对来说应该算是比较可靠的，就用了之前备份的补丁。这里用到的是burp-loader-keygen.jar和burpsuite_pro_v1.7.36.jar.然后把*burpsuite_pro_v1.7.36.jar*改名为 **burpsuite_community_v1.7.36.jar**
 
 拉到虚拟机里和Burp放入同一个目录里。
 

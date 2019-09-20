@@ -6,7 +6,7 @@ tags:
 - Leetcode 
 categories:
 - algorithms  
-- 习题  
+- 算法习题  
 - Leetcode  
 ---
 
@@ -59,6 +59,6 @@ categories:
 
 	Accepted	8 ms	9.4 MB	cpp
 
-*bin神的模板代码感觉是不错，可我的代码风格感觉没那么简介0.0，哎，~~ 扶脑壳 ~~*
+*bin神的模板代码感觉是不错，可我的代码风格感觉没那么简洁0.0，哎，~~ 扶脑壳 ~~*
 
 *(PS:好像这个主题默认不能使用方括号作为标题啊0.0)*
