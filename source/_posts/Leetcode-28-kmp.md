@@ -1,9 +1,10 @@
 ---
-title: < Leetcode 28 >. Implement strStr() 
+title: <Leetcode 28>. Implement strStr() 
 date: 2019-09-19 18:39:15
 tags:   
 - algorithms 
 - Leetcode 
+- KMP
 categories:
 - algorithms  
 - 算法习题  
