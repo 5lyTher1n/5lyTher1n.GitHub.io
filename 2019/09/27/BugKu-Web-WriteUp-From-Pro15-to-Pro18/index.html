@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="5lyTher1n's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="Pro15  Flag在index里 http://123.206.87.240:8005/post/index.php  看名字第一反应就是文件包含，但是怎么利用不清楚，试着用file://发现不行。点开链接发现进入http://123.206.87.240:8005/post/index.php?file=show.php。这大概算是证实了要利用文件包含吧。 趁着这个机会去学习了下文件包含的问">
+<meta name="keywords" content="Sec,CTF,Web,BugKu">
+<meta property="og:type" content="article">
+<meta property="og:title" content="BugKu-Web-WriteUp-From-Pro15-to-Pro18">
+<meta property="og:url" content="http://yoursite.com/2019/09/27/BugKu-Web-WriteUp-From-Pro15-to-Pro18/index.html">
+<meta property="og:site_name" content="5lyTher1n&#39;s Blog">
+<meta property="og:description" content="Pro15  Flag在index里 http://123.206.87.240:8005/post/index.php  看名字第一反应就是文件包含，但是怎么利用不清楚，试着用file://发现不行。点开链接发现进入http://123.206.87.240:8005/post/index.php?file=show.php。这大概算是证实了要利用文件包含吧。 趁着这个机会去学习了下文件包含的问">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-17T13:47:37.539Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="BugKu-Web-WriteUp-From-Pro15-to-Pro18">
+<meta name="twitter:description" content="Pro15  Flag在index里 http://123.206.87.240:8005/post/index.php  看名字第一反应就是文件包含，但是怎么利用不清楚，试着用file://发现不行。点开链接发现进入http://123.206.87.240:8005/post/index.php?file=show.php。这大概算是证实了要利用文件包含吧。 趁着这个机会去学习了下文件包含的问">
+  <link rel="canonical" href="http://yoursite.com/2019/09/27/BugKu-Web-WriteUp-From-Pro15-to-Pro18/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>BugKu-Web-WriteUp-From-Pro15-to-Pro18 | 5lyTher1n's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">5lyTher1n's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/27/BugKu-Web-WriteUp-From-Pro15-to-Pro18/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="5lyTher1n">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="5lyTher1n's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">BugKu-Web-WriteUp-From-Pro15-to-Pro18
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-27 08:29:06" itemprop="dateCreated datePublished" datetime="2019-09-27T08:29:06+08:00">2019-09-27</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-17 21:47:37" itemprop="dateModified" datetime="2019-11-17T21:47:37+08:00">2019-11-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/" itemprop="url" rel="index"><span itemprop="name">Sec</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/CTF/Web题目/" itemprop="url" rel="index"><span itemprop="name">Web题目</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/CTF/Web题目/BugKu/" itemprop="url" rel="index"><span itemprop="name">BugKu</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="Pro15-Flag在index里"><a href="#Pro15-Flag在index里" class="headerlink" title="Pro15  Flag在index里"></a>Pro15  Flag在index里</h1><blockquote>
+<p><a href="http://123.206.87.240:8005/post/index.php" target="_blank" rel="noopener">http://123.206.87.240:8005/post/index.php</a></p>
+</blockquote>
+<p>看名字第一反应就是文件包含，但是怎么利用不清楚，试着用file://发现不行。点开链接发现进入<a href="http://123.206.87.240:8005/post/index.php?file=show.php" target="_blank" rel="noopener">http://123.206.87.240:8005/post/index.php?file=show.php</a>。这大概算是证实了要利用文件包含吧。</p>
+<p>趁着这个机会去学习了下文件包含的问题。这里可以用filter伪协议来处理，首先进入的网页就是index.php了，但是题目说flag还是在index.php内，可是，找不着啊。。。那试试读下源码0.0</p>
+<p>使用诸如include等函数进行文件包含时会忽略后缀名，如果有php代码会直接解析。当没有时，会直接显示出源代码。</p>
+<p>很明显index是有php代码的，对应到显示的页面，就是解析完成后的。可以通过编码的形式，使其不被认为是合理代码，比如在<a href="http://123.206.87.240:8005/post/index.php?file=php://filter/read=convert.base64-encode/resource=index.php" target="_blank" rel="noopener">http://123.206.87.240:8005/post/index.php?file=php://filter/read=convert.base64-encode/resource=index.php</a><br>使用以Base64编码的形式读取index.php文件，可以直接放出源代码。显示出一堆编码后的字符串，拉到BP里用Decoder可以解码。Flag在注释里：<code>flag{edulcni_elif_lacol_si_siht}</code></p>
+<a id="more"></a>
+<hr>
+<h1 id="Pro16-输入密码查看flag"><a href="#Pro16-输入密码查看flag" class="headerlink" title="Pro16 输入密码查看flag"></a>Pro16 输入密码查看flag</h1><blockquote>
+<p><a href="http://123.206.87.240:8002/baopo/" target="_blank" rel="noopener">http://123.206.87.240:8002/baopo/</a></p>
+</blockquote>
+<p>看下URL，baopo…大概就有点思路了。。。<br>然后看进来，没有验证码，只让输入密码。无脑拉BP，从00000到99999进行暴力破解。<br>发现密码是<code>13579</code><br>进去后发现Flag： <code>flag{bugku-baopo-hah}</code></p>
+<hr>
+<h1 id="Pro17-点击一百万次"><a href="#Pro17-点击一百万次" class="headerlink" title="Pro17 点击一百万次"></a>Pro17 点击一百万次</h1><blockquote>
+<p><a href="http://123.206.87.240:9001/test/" target="_blank" rel="noopener">http://123.206.87.240:9001/test/</a></p>
+</blockquote>
+<p>看了下源码，有个JS记录点击次数。当点击次数大于等于一百万次后，发送POST请求。<br>那。。。直接用Hackbar发送POST请求。<code>clicks=1000000</code><br>可以直接看到Flag： <code>flag{Not_C00kI3Cl1ck3r}</code></p>
+<hr>
+<h1 id="Pro18-备份是个好习惯"><a href="#Pro18-备份是个好习惯" class="headerlink" title="Pro18 备份是个好习惯"></a>Pro18 备份是个好习惯</h1><blockquote>
+<p><a href="http://123.206.87.240:8002/web16/" target="_blank" rel="noopener">http://123.206.87.240:8002/web16/</a></p>
+</blockquote>
+<p>显示出了一个很长的字符串，看了下是两个字符串拼接的，都扔去MD5解密。提示是空的。然后。。。然后就没然后了，想不到怎么利用备份这个条件，通过备份获得Webshell？目前没法进行交互啊。。。</p>
+<p>看WP。备份的话，找bak后缀的文件，在这里找到了index.php.bak<br>下载后看到php代码：</p>
+<pre><code>include_once &quot;flag.php&quot;;
+ini_set(&quot;display_errors&quot;, 0);
+$str = strstr($_SERVER[&apos;REQUEST_URI&apos;], &apos;?&apos;);
+$str = substr($str,1);
+$str = str_replace(&apos;key&apos;,&apos;&apos;,$str);
+parse_str($str);
+echo md5($key1);
+
+echo md5($key2);
+if(md5($key1) == md5($key2) &amp;&amp; $key1 !== $key2){
+    echo $flag.&quot;取得flag&quot;;
+}
+?&gt;</code></pre><p>代码流程是：</p>
+<ol>
+<li>查找URL里是否有”?”,有就提取”?”及之后的内容</li>
+<li>过滤掉”？”</li>
+<li>顺序查找key，把key过滤成””(空)</li>
+<li>解析str，把键值对解析成变量和值</li>
+<li>输出key1和key2的md5</li>
+<li>当key1和key2的md5相等，但key1和key2的本值不同时，输出flag</li>
+</ol>
+<p>那么构造URL呢？</p>
+<ul>
+<li>首先传输进去key1和key2的值。<br>对应来看，首先用”？”开头，然后在第三步会过滤掉key，这时可以用”kkeyey”，这样过滤掉key后依然有个key…</li>
+<li>md5相等，但本值不等，有两种方式。<br>  1.数组，对数组md5加密会返回null<br>  <code>http://123.206.87.240:8002/web16/?kkeyey1[]=1&amp;kkeyey2[]=2</code><br>  2.当加密后形成0eXXX的形式，会当成科学计数法，即0乘10的XXX次幂。结果都是0自然是相等的。这里有些例子。<code>http://123.206.87.240:8002/web16/?kkeyey1=QNKCDZO&amp;kkeyey2=s155964671a</code></li>
+</ul>
+<blockquote>
+<pre><code>QNKCDZO
+240610708
+s878926199a
+s155964671a
+s214587387a
+s214587387a</code></pre></blockquote>
+<p>得到Flag：<code>Bugku{OH_YOU_FIND_MY_MOMY}</code></p>
+<hr>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>整理了几题，觉得越来越好玩了，整理东西也多了起来，因为不会的多了。。。0.0</p>
+<p>也好，不会的多了，学了，就会了0.0<br>哈哈哈，加油吧~</p>
+<p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Sec/" rel="tag"># Sec</a>
+            
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+            
+              <a href="/tags/Web/" rel="tag"># Web</a>
+            
+              <a href="/tags/BugKu/" rel="tag"># BugKu</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/26/Leetcode-922-EZ/" rel="next" title="< Leetcode 985 >. Sort Array By Parity II">
+                  <i class="fa fa-chevron-left"></i> < Leetcode 985 >. Sort Array By Parity II
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/11/17/JarvisOJ-PWN-level0-to-level3/" rel="prev" title="JarvisOJ_PWN_from_level0_to_level3">
+                  JarvisOJ_PWN_from_level0_to_level3 <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#Pro15-Flag在index里"><span class="nav-number">1.</span> <span class="nav-text">Pro15  Flag在index里</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pro16-输入密码查看flag"><span class="nav-number">2.</span> <span class="nav-text">Pro16 输入密码查看flag</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pro17-点击一百万次"><span class="nav-number">3.</span> <span class="nav-text">Pro17 点击一百万次</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Pro18-备份是个好习惯"><span class="nav-number">4.</span> <span class="nav-text">Pro18 备份是个好习惯</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/header.jpg"
+      alt="5lyTher1n">
+  <p class="site-author-name" itemprop="name">5lyTher1n</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/5lyTher1n" title="GitHub &rarr; https://github.com/5lyTher1n" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:5ly4her1n@gmail.com" title="E-Mail &rarr; mailto:5ly4her1n@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">5lyTher1n</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

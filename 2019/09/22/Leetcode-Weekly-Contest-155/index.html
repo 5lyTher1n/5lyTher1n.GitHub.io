@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+  <link rel="alternate" href="/atom.xml" title="5lyTher1n's Blog" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":true,"preload":true},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="序幕早上起来做Leetcode Contest 155，四题就做了两题出来，太逊了。。。以后的打算是争Rank的，现在才做两题。。。先整理下吧 1200. Minimum Absolute Difference 1200. Minimum Absolute Difference  题目大意：在一个元素不等的数组里，输出绝对值最小的所有对。 解法：按理说，第一题一般都是可以暴力的。直接对数组排序，然">
+<meta name="keywords" content="algorithms,Leetcode">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Leetcode Weekly Test 155">
+<meta property="og:url" content="http://yoursite.com/2019/09/22/Leetcode-Weekly-Contest-155/index.html">
+<meta property="og:site_name" content="5lyTher1n&#39;s Blog">
+<meta property="og:description" content="序幕早上起来做Leetcode Contest 155，四题就做了两题出来，太逊了。。。以后的打算是争Rank的，现在才做两题。。。先整理下吧 1200. Minimum Absolute Difference 1200. Minimum Absolute Difference  题目大意：在一个元素不等的数组里，输出绝对值最小的所有对。 解法：按理说，第一题一般都是可以暴力的。直接对数组排序，然">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-17T13:47:37.539Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Leetcode Weekly Test 155">
+<meta name="twitter:description" content="序幕早上起来做Leetcode Contest 155，四题就做了两题出来，太逊了。。。以后的打算是争Rank的，现在才做两题。。。先整理下吧 1200. Minimum Absolute Difference 1200. Minimum Absolute Difference  题目大意：在一个元素不等的数组里，输出绝对值最小的所有对。 解法：按理说，第一题一般都是可以暴力的。直接对数组排序，然">
+  <link rel="canonical" href="http://yoursite.com/2019/09/22/Leetcode-Weekly-Contest-155/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Leetcode Weekly Test 155 | 5lyTher1n's Blog</title>
+  
+
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">5lyTher1n's Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-about">
+      
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-tags">
+      
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-categories">
+      
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a href="javascript:;" class="popup-trigger">
+        
+          <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+      </li>
+    
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/22/Leetcode-Weekly-Contest-155/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="5lyTher1n">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="5lyTher1n's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">Leetcode Weekly Test 155
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-09-22 20:28:45" itemprop="dateCreated datePublished" datetime="2019-09-22T20:28:45+08:00">2019-09-22</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-17 21:47:37" itemprop="dateModified" datetime="2019-11-17T21:47:37+08:00">2019-11-17</time>
+              </span>
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/algorithms/" itemprop="url" rel="index"><span itemprop="name">algorithms</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/algorithms/算法习题/" itemprop="url" rel="index"><span itemprop="name">算法习题</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/algorithms/算法习题/Leetcode/" itemprop="url" rel="index"><span itemprop="name">Leetcode</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="序幕"><a href="#序幕" class="headerlink" title="序幕"></a>序幕</h1><p>早上起来做Leetcode Contest 155，四题就做了两题出来，太逊了。。。以后的打算是争Rank的，现在才做两题。。。先整理下吧</p>
+<h1 id="1200-Minimum-Absolute-Difference"><a href="#1200-Minimum-Absolute-Difference" class="headerlink" title="1200. Minimum Absolute Difference"></a>1200. Minimum Absolute Difference</h1><blockquote>
+<p><a href="https://leetcode.com/problems/minimum-absolute-difference/" target="_blank" rel="noopener">1200. Minimum Absolute Difference</a></p>
+</blockquote>
+<p>题目大意：<br>在一个元素不等的数组里，输出绝对值最小的所有对。</p>
+<p>解法：<br>按理说，第一题一般都是可以暴力的。直接对数组排序，然后比较相邻的绝对值，如果小于记录值则更新，等于记录值则添加。最终返回答案。</p>
+<a id="more"></a>
+
+
+<p>代码：</p>
+<pre><code>class Solution {
+    int minn = 1e7;
+    vector &lt;vector&lt;int&gt;&gt; now;
+public:
+    vector&lt;vector&lt;int&gt;&gt; minimumAbsDifference(vector&lt;int&gt;&amp; arr) {
+        sort(arr.begin(), arr.end());
+        for(int i = 1; i &lt; arr.size(); i ++){
+            int c = abs(arr[i] - arr[i-1]);
+            if(c &lt; minn){
+                minn = c;
+                now.clear();
+                now.push_back({arr[i-1], arr[i]});
+            }
+            else if(c == minn){
+                now.push_back({arr[i-1], arr[i]});
+            }
+        }
+        return now;
+    }
+};</code></pre><hr>
+<p>#1201. Ugly Number III #</p>
+<blockquote>
+<p><a href="https://leetcode.com/problems/ugly-number-iii/" target="_blank" rel="noopener">1201. Ugly Number III</a></p>
+</blockquote>
+<p>题目大意：<br>寻找第n个，能被a<strong>或</strong>被b<strong>或</strong>被c整除的数。</p>
+<ul>
+<li>1 &lt;= n, a, b, c &lt;= 10^9</li>
+<li>1 &lt;= a * b * c &lt;= 10^18</li>
+<li>It’s guaranteed that the result will be in range [1, 2 * 10^9]</li>
+</ul>
+<p>没做出来。。。这个数据范围是不可能暴力的，那么一般降低数据范围的手段有二分，可怎么二分呢？容斥这个点我是真的当时没想到，看到了题解才想起来，之前学的概率全还回去了。。。哎，菜啊。。。</p>
+<p>看了题解后的代码：</p>
+<pre><code>typedef long long ll;
+
+class Solution {
+    ll ab,ac,bc,abc;
+    ll gcd(ll x, ll y){
+        if(x % y == 0)return y;
+        return gcd(y, x%y);
+    }    
+    ll lcm(ll x,ll y){
+        return x / gcd(x,y) * y;
+    }
+    ll getNum(ll n,ll a,ll b,ll c){
+        return n/a + n/b + n/c -n/ab - n/ac - n/bc + n/abc;
+    }
+
+public:
+    int nthUglyNumber(int n, int a, int b, int c) {
+        if(a == 1 || b == 1 || c == 1 )return n;
+        ab = lcm(a,b);
+        ac = lcm(a,c);
+        bc = lcm(c,b);
+        abc = lcm(ab,c);
+
+        ll r = n * min(min(a,b),c);
+        ll l = n;
+
+        while(l &lt;= r){
+            ll mid = l + (r - l) / 2;
+            if(getNum(mid, a, b, c) &lt; n)
+                l = mid + 1;
+            else r = mid - 1;
+        }
+        return l;
+    }
+
+
+
+};</code></pre><hr>
+<h1 id="1202-Smallest-String-With-Swaps"><a href="#1202-Smallest-String-With-Swaps" class="headerlink" title="1202. Smallest String With Swaps"></a>1202. Smallest String With Swaps</h1><blockquote>
+<p><a href="https://leetcode.com/problems/smallest-string-with-swaps/" target="_blank" rel="noopener">https://leetcode.com/problems/smallest-string-with-swaps/</a></p>
+</blockquote>
+<p>题目大意：<br>给一个字符串，和一些下标数值对。可以将下标对的元素交换位置。<br>例如:</p>
+<pre><code>Input: s = &quot;cba&quot;, pairs = [[0,1],[1,2]]
+Output: &quot;abc&quot;
+Explaination: 
+Swap s[0] and s[1], s = &quot;bca&quot;
+Swap s[1] and s[2], s = &quot;bac&quot;
+Swap s[0] and s[1], s = &quot;abc&quot;</code></pre><p>解法:</p>
+<p>我的想法可能比较复杂，通过并查集来做。我看有使用不同方法的，这里通过样例可以看出，(0,1)(1,2)联通则(0，2)也是联通的。那么并查集可以处理这种问题。但我的处理方式可能有些复杂。</p>
+<p>首先用并查集找到哪些节点在一棵树上的，然后把这些节点对应的字符整理出来进行排序，之后再扫描一遍字符串查询到所属输，依次取出排序后的字符。</p>
+<p>代码：</p>
+<pre><code>class Solution {
+    int f[100010],cnt[100010];
+    vector &lt; string &gt; k;
+    int p[100010];
+public:
+
+    int Find(int t){
+        return f[t] == t ?  t : f[t] = Find(f[t]);
+    }
+
+    void init(int n){
+        for(int i = 0; i &lt; n; ++ i)f[i] = i;
+    }
+    string smallestStringWithSwaps(string s, vector&lt;vector&lt;int&gt;&gt;&amp; pairs) {
+             int n = s.size();    
+            k.resize(n);
+            init(n);
+            for(auto it : pairs){
+                int l = min(it[0],it[1]);
+                int r = max(it[1],it[0]);
+                 l = Find(l);
+                 r = Find(r);
+                if(l == r)continue;
+                f[l] = r;
+            }
+
+            for(int i = 0; i &lt; n; ++ i)f[i] = Find(i);
+
+            for(int i = 0; i &lt; n; ++ i)k[f[i]] += s[i];
+
+            for(int i = 0; i &lt; n; ++ i)
+                    if(k[i].size() &gt; 1)
+                        sort(k[i].begin(), k[i].end());
+
+            string ans = &quot;&quot;;
+
+            for(int i = 0; i &lt; n; ++ i){
+                int t = f[i];
+                int num = p[t] ++;
+                ans += k[t][num];
+            }
+            return ans;
+    }
+};</code></pre><p>重新交了下，看效率好像还行。。。就是感觉写的好繁杂，不简洁。</p>
+<pre><code>Accepted    164 ms    49.1 MB    cpp
+Runtime: 164 ms, faster than 90.00% of C++ online submissions for Smallest String With Swaps.
+Memory Usage: 49.1 MB, less than 100.00% of C++ online submissions for Smallest String With Swaps.</code></pre><hr>
+<h1 id="1203-Sort-Items-by-Groups-Respecting-Dependencies"><a href="#1203-Sort-Items-by-Groups-Respecting-Dependencies" class="headerlink" title="1203. Sort Items by Groups Respecting Dependencies"></a>1203. Sort Items by Groups Respecting Dependencies</h1><blockquote>
+<p><a href="https://leetcode.com/problems/sort-items-by-groups-respecting-dependencies/" target="_blank" rel="noopener">1203. Sort Items by Groups Respecting Dependencies
+</a></p>
+</blockquote>
+<p>Todo:看都没看。。。之后补吧</p>
+<h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>感觉还是太菜了，尽管也有些客观原因，但是还是觉得不该写这么差。同时，这种记录方式觉得不太好，总觉得有种为了记录而记录，没有那么强的总结的效果。走着看吧~</p>
+<p>加油~话说，可以在算法专题里套用一句bin神(kuangbin大佬)的话。</p>
+<p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/algorithms/" rel="tag"># algorithms</a>
+            
+              <a href="/tags/Leetcode/" rel="tag"># Leetcode</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/09/21/Leetcode-Weekly-Contest-154/" rel="next" title="Leetcode Weekly Contest 154">
+                  <i class="fa fa-chevron-left"></i> Leetcode Weekly Contest 154
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/09/23/Leetcode-878-BinSearch/" rel="prev" title="<LeetCode> 878. Nth Magical Number">
+                  <LeetCode> 878. Nth Magical Number <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#序幕"><span class="nav-number">1.</span> <span class="nav-text">序幕</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1200-Minimum-Absolute-Difference"><span class="nav-number">2.</span> <span class="nav-text">1200. Minimum Absolute Difference</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1202-Smallest-String-With-Swaps"><span class="nav-number">3.</span> <span class="nav-text">1202. Smallest String With Swaps</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#1203-Sort-Items-by-Groups-Respecting-Dependencies"><span class="nav-number">4.</span> <span class="nav-text">1203. Sort Items by Groups Respecting Dependencies</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#最后"><span class="nav-number">5.</span> <span class="nav-text">最后</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image"
+      src="/images/header.jpg"
+      alt="5lyTher1n">
+  <p class="site-author-name" itemprop="name">5lyTher1n</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-categories">
+        
+          
+            <a href="/categories/">
+          
+        
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">分类</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+          
+            <a href="/tags/">
+          
+        
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">标签</span>
+        </a>
+      </div>
+    
+  </nav>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="https://github.com/5lyTher1n" title="GitHub &rarr; https://github.com/5lyTher1n" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+    
+      <span class="links-of-author-item">
+      
+      
+        
+      
+      
+        
+      
+        <a href="mailto:5ly4her1n@gmail.com" title="E-Mail &rarr; mailto:5ly4her1n@gmail.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+    
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">5lyTher1n</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+  <script src="/js/local-search.js?v=7.4.0"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

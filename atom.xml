@@ -1,0 +1,730 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>5lyTher1n&#39;s Blog</title>
+  
+  
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://yoursite.com/"/>
+  <updated>2019-11-17T15:45:51.739Z</updated>
+  <id>http://yoursite.com/</id>
+  
+  <author>
+    <name>5lyTher1n</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>JarvisOJ_PWN_from_level0_to_level3</title>
+    <link href="http://yoursite.com/2019/11/17/JarvisOJ-PWN-level0-to-level3/"/>
+    <id>http://yoursite.com/2019/11/17/JarvisOJ-PWN-level0-to-level3/</id>
+    <published>2019-11-17T14:12:27.000Z</published>
+    <updated>2019-11-17T15:45:51.739Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="花絮"><a href="#花絮" class="headerlink" title="花絮"></a>花絮</h1><p>好久没更新Blog了，加上换了电脑，都忘记更新Blog的方法了。</p><p>一直在做课程的作业加折腾别的，刷OJ学安全这些正事反而少了很多。这段时间学习PWN的基本内容，反正是要记录的，<del>加上想起来了Github的密码</del>，就记录在Blog上吧0.0</p><p>之前只跟着视频和PDF做了下SeeD的实验内容，但是觉得，只是知道了简单的原理，实验里的操作方式又觉得过于理想化。所以找到一个CTFOJ：JarvisOJ做做题，来学习下各种基本手法和套路。</p><p>这应该算是做的前四题PWN的题目0=0<br>所以几乎全部都看了WP后才做的<br>毕竟都不会。。。</p><a id="more"></a><h1 id="Level-0"><a href="#Level-0" class="headerlink" title="Level 0"></a>Level 0</h1><h2 id="独立解题"><a href="#独立解题" class="headerlink" title="独立解题"></a>独立解题</h2><p>啥都不会，工具也不知道用什么，独立不出来，直接去找题解。</p><h2 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h2><ol><li>使用IDA打开文件。<br>在String里查看，找到了system(‘/bin/sh’）双击后，进入可以看到地址。</li><li>在vulnerable_function里看到buf后边写了长度，然后函数命令里的长度超过了buf的长度，存在栈溢出</li><li>前边的用‘a’填充后在RTN的位置上填上system的地址。</li></ol><h1 id="Level1"><a href="#Level1" class="headerlink" title="Level1"></a>Level1</h1><h2 id="独立解题-1"><a href="#独立解题-1" class="headerlink" title="独立解题"></a>独立解题</h2><ul><li>查看栈空间，发现存在栈溢出。</li><li>查看string，没有找到/bin/sh等内容</li></ul><p>OK，卡壳。不知道怎么利用了。。。</p><h2 id="题解-1"><a href="#题解-1" class="headerlink" title="题解"></a>题解</h2><ol><li>查看checksec，发现是32位。看到NX保护是关闭的，了解到NX保护关闭时可以执行栈内的代码。</li><li>%p 输出是指针，可以利用这个地址作为rtn。直接先键入shellcode再填充就好了</li><li>这题比较像SeeD的实验题目，但是那个%p一开始不知道是什么，也不知道怎么利用。 </li></ol><h1 id="Level2"><a href="#Level2" class="headerlink" title="Level2"></a>Level2</h1><h2 id="独立解题-2"><a href="#独立解题-2" class="headerlink" title="独立解题"></a>独立解题</h2><ul><li>checksec，32位。NX打开。所以不能像上一题在栈内填充shellcode</li><li>查看代码，vulnerable_function存在栈溢出</li><li>查看string。里面有/bin/sh。双击跟进，模仿level0的方式，把/bin/sh的地址填入到rtn里。发现出错。<h2 id="题解-2"><a href="#题解-2" class="headerlink" title="题解"></a>题解</h2></li></ul><ol><li>一个误解，不是有了/bin/sh的字符串就可以直接利用的，仔细看下第一题，那是system(‘/bin/sh’),是调用了system函数，以字符串为参数才可以。</li><li>一个常识，之前好像看到这个知识点，但最后忘记了。在32位里，参数是通过压栈的方式传递。在64位里好像是用到的寄存器。</li><li>直接rnt到一个a函数，下一个填充的是a函数结束后跳转到的位置，然后在栈地址减小的方向，从左往右的参数(这好像是栈帧的结构？又记不清楚了)。</li><li>利用pwntools里的工具，search和symbols可以找到system函数地址和‘/bin/sh’的地址。构造payload就可以了</li></ol><h1 id="Level3"><a href="#Level3" class="headerlink" title="Level3"></a>Level3</h1><h2 id="独立解题-3"><a href="#独立解题-3" class="headerlink" title="独立解题"></a>独立解题</h2><p>和上一题很相似，但是内部没有system函数和shell字符串。卡壳</p><h2 id="题解-3"><a href="#题解-3" class="headerlink" title="题解"></a>题解</h2><ol><li>忘记了还有库这种东西，仔细看看解压完成后，还有一个libc-2.19.so的文件。这题倒是让我想起了之前看的Whatsapp那个漏洞。</li><li>知道了点GOT表这个东西，存放了函数运行时的真实内存地址。同时，两个函数在库里的偏移量与内存中真实内存地址的偏移量相等。这个知识点在了解时发现好像CSAPP里有，可我没看到那个地方。</li><li>IDA看代码时发现，里面有write函数。学习到了，可以利用write函数进行第一次溢出产生内存泄漏，输出write函数在运行时的内存地址,write函数有3个参数，第一个是FD，这里用1，表示标准输出。第二个参数是输出的 内容，这里就是got[‘write’];第三个参数是输出大小，4个字节？可以输出8位，也就是内存地址了。当write函数结束时返回到vulnerable_function，再进行下一次的溢出。</li><li>二次溢出。在（3）中读取到内存地址后，在libc的库里找到write、system、shell字符串的地址，利用偏移量相等可以计算出运行后两者时内存地址。</li><li>构造payload</li></ol><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这四题大概是两天写的，都写完后根据整理的草稿睡前整理的文章。</p><p>写的太乱而且也不详细，不觉得别人看了有什么用，因为是草稿，大概只是记录了自己的疑问和注意点，比较适合我自己去回顾，相比之下，之前Web类的题目可能还对人有些帮助。</p><ul><li>没有介绍太多工具的使用，但其实在整个过程中发现，对IDA、pwntools、gdb的使用都很不足，这些工具真的要能掌握好，做到熟练使用，工欲善其事必先利其器。</li><li>之前打算看CSAPP。但是真的很纠结于细枝末节，导致整个进度都很慢，而且容易断。查资料的过程中加上之前看到的经验贴，都提到了这本书的重要性，尽量在2019年把这本书给过一遍，可以不熟练，但是要有比较好的印象。</li></ul><p>整理些在做题中遇到的问题吧：</p><ul><li>IDA是7.0版本，之前整理了7.2版本但是32位版本好像没办法F5，所以用的是7.0版本，使用在Windows 8.1的虚拟机里，好像也可以在Linux环境下使用，但是，现在不太想折腾，就算了。<del>反正又不是不能用.jpg</del></li><li>pwntools好像没办法在win下使用，所以在Ubuntu 16.04里</li><li>看到的很多题解的python代码是2.7版本的。我的环境是3.5.2在使用他们的代码时发现，bytes是一个比较常见的问题。在我使用时，需要对str进行encode函数转换成bytes。在做level1时想到了SeeD里提到到spray方法，就是填充NOP。但是对\x90进行encode时会多出来一个\xc2的字符。搜了下好像暂时没解决。是之后想起来pwntools介绍里提到nop的操作，发现好像可以用asm(‘nop’)实现spray。</li></ul><p>整理的很乱，但是大多数主要的点算是记录了下来，也方便之后自己看，我把‘显示更多’放在正文之前。<br>之后整理文章应该会更科学更方便观看吧，加油！</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;花絮&quot;&gt;&lt;a href=&quot;#花絮&quot; class=&quot;headerlink&quot; title=&quot;花絮&quot;&gt;&lt;/a&gt;花絮&lt;/h1&gt;&lt;p&gt;好久没更新Blog了，加上换了电脑，都忘记更新Blog的方法了。&lt;/p&gt;
+&lt;p&gt;一直在做课程的作业加折腾别的，刷OJ学安全这些正事反而少了很多。这段时间学习PWN的基本内容，反正是要记录的，&lt;del&gt;加上想起来了Github的密码&lt;/del&gt;，就记录在Blog上吧0.0&lt;/p&gt;
+&lt;p&gt;之前只跟着视频和PDF做了下SeeD的实验内容，但是觉得，只是知道了简单的原理，实验里的操作方式又觉得过于理想化。所以找到一个CTFOJ：JarvisOJ做做题，来学习下各种基本手法和套路。&lt;/p&gt;
+&lt;p&gt;这应该算是做的前四题PWN的题目0=0&lt;br&gt;所以几乎全部都看了WP后才做的&lt;br&gt;毕竟都不会。。。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/categories/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/categories/Sec/CTF/"/>
+    
+      <category term="PWN" scheme="http://yoursite.com/categories/Sec/CTF/PWN/"/>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/tags/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/tags/CTF/"/>
+    
+      <category term="PWN" scheme="http://yoursite.com/tags/PWN/"/>
+    
+      <category term="JarvisOJ" scheme="http://yoursite.com/tags/JarvisOJ/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>BugKu-Web-WriteUp-From-Pro15-to-Pro18</title>
+    <link href="http://yoursite.com/2019/09/27/BugKu-Web-WriteUp-From-Pro15-to-Pro18/"/>
+    <id>http://yoursite.com/2019/09/27/BugKu-Web-WriteUp-From-Pro15-to-Pro18/</id>
+    <published>2019-09-27T00:29:06.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="Pro15-Flag在index里"><a href="#Pro15-Flag在index里" class="headerlink" title="Pro15  Flag在index里"></a>Pro15  Flag在index里</h1><blockquote><p><a href="http://123.206.87.240:8005/post/index.php" target="_blank" rel="noopener">http://123.206.87.240:8005/post/index.php</a></p></blockquote><p>看名字第一反应就是文件包含，但是怎么利用不清楚，试着用file://发现不行。点开链接发现进入<a href="http://123.206.87.240:8005/post/index.php?file=show.php" target="_blank" rel="noopener">http://123.206.87.240:8005/post/index.php?file=show.php</a>。这大概算是证实了要利用文件包含吧。</p><p>趁着这个机会去学习了下文件包含的问题。这里可以用filter伪协议来处理，首先进入的网页就是index.php了，但是题目说flag还是在index.php内，可是，找不着啊。。。那试试读下源码0.0</p><p>使用诸如include等函数进行文件包含时会忽略后缀名，如果有php代码会直接解析。当没有时，会直接显示出源代码。</p><p>很明显index是有php代码的，对应到显示的页面，就是解析完成后的。可以通过编码的形式，使其不被认为是合理代码，比如在<a href="http://123.206.87.240:8005/post/index.php?file=php://filter/read=convert.base64-encode/resource=index.php" target="_blank" rel="noopener">http://123.206.87.240:8005/post/index.php?file=php://filter/read=convert.base64-encode/resource=index.php</a><br>使用以Base64编码的形式读取index.php文件，可以直接放出源代码。显示出一堆编码后的字符串，拉到BP里用Decoder可以解码。Flag在注释里：<code>flag{edulcni_elif_lacol_si_siht}</code></p><a id="more"></a><hr><h1 id="Pro16-输入密码查看flag"><a href="#Pro16-输入密码查看flag" class="headerlink" title="Pro16 输入密码查看flag"></a>Pro16 输入密码查看flag</h1><blockquote><p><a href="http://123.206.87.240:8002/baopo/" target="_blank" rel="noopener">http://123.206.87.240:8002/baopo/</a></p></blockquote><p>看下URL，baopo…大概就有点思路了。。。<br>然后看进来，没有验证码，只让输入密码。无脑拉BP，从00000到99999进行暴力破解。<br>发现密码是<code>13579</code><br>进去后发现Flag： <code>flag{bugku-baopo-hah}</code></p><hr><h1 id="Pro17-点击一百万次"><a href="#Pro17-点击一百万次" class="headerlink" title="Pro17 点击一百万次"></a>Pro17 点击一百万次</h1><blockquote><p><a href="http://123.206.87.240:9001/test/" target="_blank" rel="noopener">http://123.206.87.240:9001/test/</a></p></blockquote><p>看了下源码，有个JS记录点击次数。当点击次数大于等于一百万次后，发送POST请求。<br>那。。。直接用Hackbar发送POST请求。<code>clicks=1000000</code><br>可以直接看到Flag： <code>flag{Not_C00kI3Cl1ck3r}</code></p><hr><h1 id="Pro18-备份是个好习惯"><a href="#Pro18-备份是个好习惯" class="headerlink" title="Pro18 备份是个好习惯"></a>Pro18 备份是个好习惯</h1><blockquote><p><a href="http://123.206.87.240:8002/web16/" target="_blank" rel="noopener">http://123.206.87.240:8002/web16/</a></p></blockquote><p>显示出了一个很长的字符串，看了下是两个字符串拼接的，都扔去MD5解密。提示是空的。然后。。。然后就没然后了，想不到怎么利用备份这个条件，通过备份获得Webshell？目前没法进行交互啊。。。</p><p>看WP。备份的话，找bak后缀的文件，在这里找到了index.php.bak<br>下载后看到php代码：</p><pre><code>include_once &quot;flag.php&quot;;ini_set(&quot;display_errors&quot;, 0);$str = strstr($_SERVER[&apos;REQUEST_URI&apos;], &apos;?&apos;);$str = substr($str,1);$str = str_replace(&apos;key&apos;,&apos;&apos;,$str);parse_str($str);echo md5($key1);echo md5($key2);if(md5($key1) == md5($key2) &amp;&amp; $key1 !== $key2){    echo $flag.&quot;取得flag&quot;;}?&gt;</code></pre><p>代码流程是：</p><ol><li>查找URL里是否有”?”,有就提取”?”及之后的内容</li><li>过滤掉”？”</li><li>顺序查找key，把key过滤成””(空)</li><li>解析str，把键值对解析成变量和值</li><li>输出key1和key2的md5</li><li>当key1和key2的md5相等，但key1和key2的本值不同时，输出flag</li></ol><p>那么构造URL呢？</p><ul><li>首先传输进去key1和key2的值。<br>对应来看，首先用”？”开头，然后在第三步会过滤掉key，这时可以用”kkeyey”，这样过滤掉key后依然有个key…</li><li>md5相等，但本值不等，有两种方式。<br>  1.数组，对数组md5加密会返回null<br>  <code>http://123.206.87.240:8002/web16/?kkeyey1[]=1&amp;kkeyey2[]=2</code><br>  2.当加密后形成0eXXX的形式，会当成科学计数法，即0乘10的XXX次幂。结果都是0自然是相等的。这里有些例子。<code>http://123.206.87.240:8002/web16/?kkeyey1=QNKCDZO&amp;kkeyey2=s155964671a</code></li></ul><blockquote><pre><code>QNKCDZO240610708s878926199as155964671as214587387as214587387a</code></pre></blockquote><p>得到Flag：<code>Bugku{OH_YOU_FIND_MY_MOMY}</code></p><hr><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>整理了几题，觉得越来越好玩了，整理东西也多了起来，因为不会的多了。。。0.0</p><p>也好，不会的多了，学了，就会了0.0<br>哈哈哈，加油吧~</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;Pro15-Flag在index里&quot;&gt;&lt;a href=&quot;#Pro15-Flag在index里&quot; class=&quot;headerlink&quot; title=&quot;Pro15  Flag在index里&quot;&gt;&lt;/a&gt;Pro15  Flag在index里&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;http://123.206.87.240:8005/post/index.php&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http://123.206.87.240:8005/post/index.php&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;看名字第一反应就是文件包含，但是怎么利用不清楚，试着用file://发现不行。点开链接发现进入&lt;a href=&quot;http://123.206.87.240:8005/post/index.php?file=show.php&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http://123.206.87.240:8005/post/index.php?file=show.php&lt;/a&gt;。这大概算是证实了要利用文件包含吧。&lt;/p&gt;
+&lt;p&gt;趁着这个机会去学习了下文件包含的问题。这里可以用filter伪协议来处理，首先进入的网页就是index.php了，但是题目说flag还是在index.php内，可是，找不着啊。。。那试试读下源码0.0&lt;/p&gt;
+&lt;p&gt;使用诸如include等函数进行文件包含时会忽略后缀名，如果有php代码会直接解析。当没有时，会直接显示出源代码。&lt;/p&gt;
+&lt;p&gt;很明显index是有php代码的，对应到显示的页面，就是解析完成后的。可以通过编码的形式，使其不被认为是合理代码，比如在&lt;a href=&quot;http://123.206.87.240:8005/post/index.php?file=php://filter/read=convert.base64-encode/resource=index.php&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http://123.206.87.240:8005/post/index.php?file=php://filter/read=convert.base64-encode/resource=index.php&lt;/a&gt;&lt;br&gt;使用以Base64编码的形式读取index.php文件，可以直接放出源代码。显示出一堆编码后的字符串，拉到BP里用Decoder可以解码。Flag在注释里：&lt;code&gt;flag{edulcni_elif_lacol_si_siht}&lt;/code&gt;&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/categories/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/categories/Sec/CTF/"/>
+    
+      <category term="Web题目" scheme="http://yoursite.com/categories/Sec/CTF/Web%E9%A2%98%E7%9B%AE/"/>
+    
+      <category term="BugKu" scheme="http://yoursite.com/categories/Sec/CTF/Web%E9%A2%98%E7%9B%AE/BugKu/"/>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/tags/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/tags/CTF/"/>
+    
+      <category term="Web" scheme="http://yoursite.com/tags/Web/"/>
+    
+      <category term="BugKu" scheme="http://yoursite.com/tags/BugKu/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>&lt; Leetcode 985 &gt;. Sort Array By Parity II</title>
+    <link href="http://yoursite.com/2019/09/26/Leetcode-922-EZ/"/>
+    <id>http://yoursite.com/2019/09/26/Leetcode-922-EZ/</id>
+    <published>2019-09-26T14:51:23.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="题目信息"><a href="#题目信息" class="headerlink" title="题目信息"></a>题目信息</h1><blockquote><p><a href="https://leetcode.com/problems/sort-array-by-parity-ii/" target="_blank" rel="noopener">Sort Array By Parity II</a></p></blockquote><p>题目大意：<br>给一个数组A，里面有偶数个元素，一半为奇数，一半为偶数，要求使偶数位置为偶数，奇数位置为奇数，从0计数。</p><a id="more"></a><h1 id="解题思路"><a href="#解题思路" class="headerlink" title="解题思路"></a>解题思路</h1><p>时空要求不高，可以直接写。同时因为偶数个元素，奇偶数量相等，不存在偶数放完后还有大量奇数没有放。应该是同时放完。</p><p>第一反应，新建3个ans、odd、even数组，然后扫一遍A，把偶数放在even，奇数放在odd里。然后分别放入ans。</p><pre><code>class Solution {public:    vector&lt;int&gt; sortArrayByParityII(vector&lt;int&gt;&amp; A) {        vector&lt;int&gt; ans,odd,even;        for(auto it : A){            if(it &amp; 1)odd.push_back(it);            else even.push_back(it);        }        for(int k=0,i = 0,j = 0; j &lt; even.size() || i &lt; odd.size(); )            if(k++ &amp; 1)                ans.push_back(odd[i++]);            else ans.push_back(even[j++]);        return ans;    }};</code></pre><p>思考，觉得可以不用odd和even。扫描时找奇偶直接放进ans</p><pre><code>class Solution {public:    vector&lt;int&gt; sortArrayByParityII(vector&lt;int&gt;&amp; a) {        vector&lt;int&gt; ans,odd,even;        int n = a.size();        for(int i = 0,j = 0; i &lt; n &amp;&amp; j &lt; n; ){            while(i &lt; n){                if(a[i] % 2 == 0)break;                else ++ i;            }              while(j &lt; n){                if(a[j] % 2 == 1)break;                else ++ j;            }            if(i == n || j == n)break;            ans.push_back(a[i]);            ans.push_back(a[j]);            ++ j;            ++ i;        }       // ans.push_back(a[n-1]);        return ans;    }};</code></pre><p>感觉时间复杂度不是很好降了，最差也是O(n)，这个数据量常数影响应该不大，提交几次发现时间上下浮动20ms差不多就这样了。<br>看了下Discuss有没有什么好玩的，发现降低空间复杂度和简洁的写法。可以直接使用swap</p><pre><code>class Solution {public:    vector&lt;int&gt; sortArrayByParityII(vector&lt;int&gt;&amp; A) {        for(int i = 0,j = 1; i &lt; A.size() ;i+=2,j+=2){            while(i &lt; A.size() &amp;&amp; A[i] % 2 == 0) i += 2;             while(j &lt; A.size() &amp;&amp; A[j] % 2 == 1) j += 2;            if(i &lt; A.size() )swap(A[i], A[j]);        }        return A;    }};</code></pre><p>不难理解，直接定位终态，寻找初态的转换。很简洁也没浪费空间。</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>继续颓。。。尽快把乱七八糟的事处理完吧，加油~</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;题目信息&quot;&gt;&lt;a href=&quot;#题目信息&quot; class=&quot;headerlink&quot; title=&quot;题目信息&quot;&gt;&lt;/a&gt;题目信息&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/sort-array-by-parity-ii/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Sort Array By Parity II&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;题目大意：&lt;br&gt;给一个数组A，里面有偶数个元素，一半为奇数，一半为偶数，要求使偶数位置为偶数，奇数位置为奇数，从0计数。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+      <category term="算法杂项实现" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95%E6%9D%82%E9%A1%B9%E5%AE%9E%E7%8E%B0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>&lt; Leetcode 598 &gt;. Range Addition II</title>
+    <link href="http://yoursite.com/2019/09/25/Leetcode-598-EZ/"/>
+    <id>http://yoursite.com/2019/09/25/Leetcode-598-EZ/</id>
+    <published>2019-09-25T04:42:11.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><blockquote><p><a href="https://leetcode.com/problems/range-addition-ii/" target="_blank" rel="noopener">Range Addition II</a></p></blockquote><p>题目大意：<br>给一个m*n的矩阵，初始全为0。然后给k个操作。每个操作给两个数字a与b，使M[i][j]加一，其中0 &lt;= i &lt; a,0&lt;=j&lt;b。<br>求最大数的个数</p><a id="more"></a><h1 id="解体思路"><a href="#解体思路" class="headerlink" title="解体思路"></a>解体思路</h1><p>看到这题想到以前做的NOIP铺地毯，都是区间覆盖问题。但是又不一样，这题要求的是求最大覆盖层的和。仔细看下，覆盖方式可以类比成，以(1,1)为定点，拉扯鼠标画范围，也就是无论什么区间，都是必然经过起点(1,1)的，可以扩展出来，离起点越近的点也就被覆盖的可能越大，那么，只要统计每次(a,b)的最小值即可。</p><pre><code>class Solution {public:    int maxCount(int m, int n, vector&lt;vector&lt;int&gt;&gt;&amp; ops) {        for(auto it : ops){            m = min(m,it[0]);            n = min(n,it[1]);        }        return n * m;    }};</code></pre><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>今天有点颓0.0<br>加油吧~</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;题目描述&quot;&gt;&lt;a href=&quot;#题目描述&quot; class=&quot;headerlink&quot; title=&quot;题目描述&quot;&gt;&lt;/a&gt;题目描述&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/range-addition-ii/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Range Addition II&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;题目大意：&lt;br&gt;给一个m*n的矩阵，初始全为0。然后给k个操作。每个操作给两个数字a与b，使M[i][j]加一，其中0 &amp;lt;= i &amp;lt; a,0&amp;lt;=j&amp;lt;b。&lt;br&gt;求最大数的个数&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+      <category term="算法杂项实现" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95%E6%9D%82%E9%A1%B9%E5%AE%9E%E7%8E%B0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>&lt; Leetcode 985 &gt;. Sum of Even Numbers After Queries</title>
+    <link href="http://yoursite.com/2019/09/25/Leetcode-985-EZ/"/>
+    <id>http://yoursite.com/2019/09/25/Leetcode-985-EZ/</id>
+    <published>2019-09-25T02:30:13.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><blockquote><p><a href="https://leetcode.com/problems/sum-of-even-numbers-after-queries/" target="_blank" rel="noopener">Sum of Even Numbers After Queries</a></p></blockquote><p>题目大意：给一个数组queries，每个query有两个元素，idx = query[1],表示A的位置，val = query[0]，表示给A[idx] += val。idx从0开始计数，值改变一直有效。每次计算每项值是偶数的和，放入ans里，最后返回ans</p><a id="more"></a><hr><h1 id="解体思路"><a href="#解体思路" class="headerlink" title="解体思路"></a>解体思路</h1><p>看数据范围暴力不现实。发现一些规律</p><ol><li>odd -&gt; even  : += A[idx] + val</li><li>odd -&gt; odd   : Ignore</li><li>even -&gt; even : += val</li><li>even -&gt; odd  : -= A[idx]</li><li>A[idx] += val</li></ol><p>每次修改后，都可以直接对sum进行对应修改，那么直接先计算出初始偶数和，然后判断对A[idx]加上val的值情况，对sum进行更新就可以了</p><p><em>话说，单点修改，如果是求区间和，这题就是树状数组或线段树问题了。</em></p><pre><code>class Solution {public:    vector&lt;int&gt; sumEvenAfterQueries(vector&lt;int&gt;&amp; A, vector&lt;vector&lt;int&gt;&gt;&amp; queries) {        int sum = 0;        vector &lt;int&gt; ans;        for(auto it : A)if(it  % 2 == 0)sum += it;        for(auto it : queries){            int val = it[0];            int idx = it[1];            int t = A[idx];            if(t &amp; 1){                if((val + t) % 2 == 0)                    sum += val+t;            }else {                if ((val + t ) &amp; 1) sum -= t;                else sum += val;            }            A[idx] += val;             ans.push_back(sum);        }        return ans;    }};</code></pre><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>分析下还是能分析出来的，但看标签式Eazy，哎，总感觉难度分级不太合理，但细想好像也不难<del>加油吧</del> </p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;题目描述&quot;&gt;&lt;a href=&quot;#题目描述&quot; class=&quot;headerlink&quot; title=&quot;题目描述&quot;&gt;&lt;/a&gt;题目描述&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/sum-of-even-numbers-after-queries/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Sum of Even Numbers After Queries&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;题目大意：给一个数组queries，每个query有两个元素，idx = query[1],表示A的位置，val = query[0]，表示给A[idx] += val。idx从0开始计数，值改变一直有效。每次计算每项值是偶数的和，放入ans里，最后返回ans&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+      <category term="算法杂项实现" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95%E6%9D%82%E9%A1%B9%E5%AE%9E%E7%8E%B0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>&lt; LeetCode 264 &gt;.Ugly Number II</title>
+    <link href="http://yoursite.com/2019/09/24/LeetCode-264-DP/"/>
+    <id>http://yoursite.com/2019/09/24/LeetCode-264-DP/</id>
+    <published>2019-09-24T14:21:17.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="题面信息"><a href="#题面信息" class="headerlink" title="题面信息"></a>题面信息</h1><blockquote><p><a href="https://leetcode.com/problems/ugly-number-ii/" target="_blank" rel="noopener">Ugly Number II</a></p></blockquote><p>题目大意：<br>找到第n个质因数只有2、3、5其中一个或几个的正数。</p><a id="more"></a><h1 id="思路过程"><a href="#思路过程" class="headerlink" title="思路过程"></a>思路过程</h1><p>先写了这题的退化版本，<a href="https://leetcode.com/problems/ugly-number" target="_blank" rel="noopener">Ugly Number 263</a> 即判断一个数是否是Ugly Number，然后写这一题，很自然的会想到暴力，然后发现错误的估计了时间复杂度。</p><p>再加上写过<a href="https://leetcode.com/problems/nth-magical-number/" target="_blank" rel="noopener">878. Nth Magical Number</a>又去想二分，细想下，不对，878是只要可以整除即可，但这题是最多只能有2，3，5这三个质因数。比如28，对878来说，可以被2整除，符合。但在264里28 = 2 * 2 * 7,质因数还有一个7，所以不符合。</p><p>要换别的做法，在暴力时打了下表，发现数字中间空隙逐渐变大，直接枚举数需要跳过很多非Ugly数。那么考虑，三重循环，枚举n个2，3，5的乘积，放入set里排序，当set.size等于n时结束返回答案。但很明显，1<em>5 &gt; 2</em>2,直接写可能会把更大的数直接拉进set里，导致output大于exp出错。</p><p>思路在这里卡住了，看了下Discuss，很棒的一种处理方式：</p><ol><li>根据题意数字1符合要求。在list里的1，2，3，5都是符合要求的，可以利用list里的元素去乘2，3，5能保证乘出来的数依然是符合要求的。</li><li>利用三个变量选择list里对应乘上2，3，5最小的数。</li><li>将乘上后满足要求最小的数加入list里，同时，哪个变量产生的最小数进行更新。</li></ol><p><em>表达不好啊，不知道怎么说。。。:(</em></p><p>直接看代码可能更明白些。。。</p><pre><code>class Solution {public:    int nthUglyNumber(int n) {        vector &lt;int&gt; ans(n);        ans[0] = 1;        int a,b,c;        a = b = c = 0;        for(int i = 1; i &lt; n; ++ i){            ans[i] = min(ans[a] * 2, min(ans[b] * 3, ans[c] * 5));            if(ans[i] == ans[a] * 2)++ a;            if(ans[i] == ans[b] * 3)++ b;            if(ans[i] == ans[c] * 5)++ c;        }        return ans[n-1];    }};</code></pre><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>解这种题总是容易卡住在某个点上，觉得现在代码实现能力太差了，而且思路太窄，常见的题型也都没见全，多刷刷吧~</p><p>加油吧~</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;题面信息&quot;&gt;&lt;a href=&quot;#题面信息&quot; class=&quot;headerlink&quot; title=&quot;题面信息&quot;&gt;&lt;/a&gt;题面信息&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/ugly-number-ii/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Ugly Number II&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;题目大意：&lt;br&gt;找到第n个质因数只有2、3、5其中一个或几个的正数。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+      <category term="DP" scheme="http://yoursite.com/tags/DP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>&lt; LeetCode 313 &gt;. Super Ugly Number</title>
+    <link href="http://yoursite.com/2019/09/24/LeetCode-313-DP/"/>
+    <id>http://yoursite.com/2019/09/24/LeetCode-313-DP/</id>
+    <published>2019-09-24T14:21:00.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="题目信息"><a href="#题目信息" class="headerlink" title="题目信息"></a>题目信息</h1><blockquote><p><a href="https://leetcode.com/problems/super-ugly-number/" target="_blank" rel="noopener">https://leetcode.com/problems/super-ugly-number/</a></p></blockquote><p>题目大意：<br><a href="https://leetcode.com/problems/ugly-number-ii/" target="_blank" rel="noopener">264 Ugly Number II</a>的变形，其实能弄明白264的原理后，这题就不难了，无外乎原来3个因数2，3，5 变成了k个质因数保存在primes里了。</p><p>依然可以用264的思路，维护t[i]使primes[i]*ans[t[i]]最小，遍历i产生的最小值加入ans里，保证了加入到ans里的数的质因数都只存在于primes里，同时也保证每次加入进来的是当前最小的，不会遗漏的同时保证ans呈升序排列。</p><a id="more"></a><p><em>PS：话说，这两天和Ugly Number干上了。。。把这个系列都做了下0.0</em></p><p>代码：</p><pre><code>class Solution {public:    int nthSuperUglyNumber(int n, vector&lt;int&gt;&amp; p) {         int k = p.size();        vector&lt;int&gt; ans(n),t(k);        ans[0] = 1;        for(int i = 1; i &lt; n; ++ i){            int m = p[0] * ans[ t[0] ];            for(int j = 1; j &lt; k; j ++)                m = min(p[j] * ans[ t[j] ], m);             ans[i] = m;             for(int j = 0; j &lt; k; j ++)                if(m == p[j] * ans[ t[j] ] ) ++ t[j];        }        return ans[n-1];    }};</code></pre><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>在做了264后能做出来313，说明智商没退化到原始人地步0.0<br>讲道理如果还做不出来就太不应该了。<br>碰到题目要多思考看看能不能扩展，能不能形成模板，换些条件是什么样吧，尽管不太容易能做到，也要多尝试吧<del>加油</del></p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;题目信息&quot;&gt;&lt;a href=&quot;#题目信息&quot; class=&quot;headerlink&quot; title=&quot;题目信息&quot;&gt;&lt;/a&gt;题目信息&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/super-ugly-number/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://leetcode.com/problems/super-ugly-number/&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;题目大意：&lt;br&gt;&lt;a href=&quot;https://leetcode.com/problems/ugly-number-ii/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;264 Ugly Number II&lt;/a&gt;的变形，其实能弄明白264的原理后，这题就不难了，无外乎原来3个因数2，3，5 变成了k个质因数保存在primes里了。&lt;/p&gt;
+&lt;p&gt;依然可以用264的思路，维护t[i]使primes[i]*ans[t[i]]最小，遍历i产生的最小值加入ans里，保证了加入到ans里的数的质因数都只存在于primes里，同时也保证每次加入进来的是当前最小的，不会遗漏的同时保证ans呈升序排列。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+      <category term="DP" scheme="http://yoursite.com/tags/DP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>&lt; Leetcode 263 &gt;. Ugly Number</title>
+    <link href="http://yoursite.com/2019/09/24/Leetcode-263-EZ/"/>
+    <id>http://yoursite.com/2019/09/24/Leetcode-263-EZ/</id>
+    <published>2019-09-24T02:30:11.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><blockquote><p> <a href="https://leetcode.com/problems/ugly-number/" target="_blank" rel="noopener">Ugly Number</a></p></blockquote><p>题目大意：<br>判断一个数是否只能被2，3，5整除，即不存在其他因数。</p><a id="more"></a><h1 id="原始解法"><a href="#原始解法" class="headerlink" title="原始解法"></a>原始解法</h1><p>直接实现。</p><pre><code>    class Solution {    public:    bool isUgly(int num) {         if( !num )return false;         while( !(num % 2))num /= 2;         while( !(num % 3))num /= 3;         while( !(num % 5))num /= 5;        if(num == 1)return true;        return false;    }};</code></pre><h1 id="修改解法"><a href="#修改解法" class="headerlink" title="修改解法"></a>修改解法</h1><p>看了Discuss的一种解法，觉得看着挺简洁舒服的。。。</p><pre><code>class Solution {    public:        bool isUgly(int num) {             for(int i = 2; i &lt;= 5 &amp;&amp; num ; ++ i)                    while(num % i == 0)num /= i;            return num == 1;        }};</code></pre><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>简单题也尽量写的简洁舒适，要可以在Notepad写完交上去也能对的程度。</p><p>加油~</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;题目描述&quot;&gt;&lt;a href=&quot;#题目描述&quot; class=&quot;headerlink&quot; title=&quot;题目描述&quot;&gt;&lt;/a&gt;题目描述&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt; &lt;a href=&quot;https://leetcode.com/problems/ugly-number/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Ugly Number&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;题目大意：&lt;br&gt;判断一个数是否只能被2，3，5整除，即不存在其他因数。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+      <category term="算法杂项实现" scheme="http://yoursite.com/tags/%E7%AE%97%E6%B3%95%E6%9D%82%E9%A1%B9%E5%AE%9E%E7%8E%B0/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>&lt; Leetcode 238 &gt;. Product of Array Except Self</title>
+    <link href="http://yoursite.com/2019/09/23/Leetcode-238-Interesting/"/>
+    <id>http://yoursite.com/2019/09/23/Leetcode-238-Interesting/</id>
+    <published>2019-09-23T14:52:33.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><p>给一个含有n个数的数组nums，求一个新的数组ans，</p><ol><li><p>ans[i] = $\prod_{j=1}^{n，i != j}$ nums[j]</p></li><li><p>时间复杂度O(n)，不能用除法，不考虑nums的情况下空间复杂度O(1).</p></li></ol><h1 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h1><p>想起来一句话，如果一道题附加了条件，或者改变数据量，会变成另一题。这个题如果数据量小，没有附加要求的话，可以直接暴力。时间复杂度是O($n^2$)。</p><a id="more"></a><p>但是增加了时间复杂度，数据量小依然可以用类似前缀和的方式，计算全部整体的积m，然后对<code>ans[i] = m / nums[i];</code></p><p>如果如题要求，不能用除法后，上述方法就都不能用了。看样子这应该是面试题目，但觉得挺有趣而且应该是有一定考虑的。只是我一时没想到怎么写0.0，去翻Discuss。。。</p><p>首先，之前用的除法方式是一把抓然后扣掉不要的那个。现在可以换个方法，根据不要的那个，分成左右两边，ans[i] = 分割线左积 * 分割线右积。相关代码：</p><pre><code>l[0] = r[0] = 1;for(i = 1; i &lt; n; ++ i){    l[i] = l[i-1] * nums[i-1];    r[i] = r[i-1] * nums[n-i];}for(i = 0; i &lt; n; ++ i)    ans[i] = l[i] * r[n-i-1]; </code></pre><p>现在满足了时间复杂度，但是空间复杂度依然不对。进一步优化空间，可以发现，两个数组其实没有存在的必要性，他们只在一次运算后就抛弃了，可以用两个数来进行这种运算。变量l用来计算左端乘积，而r用来计算右端乘积，对每个ans[i]会乘一次l，乘一次r。相关代码：</p><pre><code>l = r = 1;for(i = 0; i &lt; n; ++ i){    ans[i] *= l;    l *= nums[i];    ans[n-i-1] *= r;    r *= nums[n-i-1];}</code></pre><p>这里会发现，每个元素会先后乘两次，乘一次l，乘一次r。像是两个点，一个从左往右走，一个从右往左走。假设i在前半部分，在第一次走到i时，l已经是前i-1个元素的乘积，在第二次走到i时，r已经是后边从i+1到n的成绩。</p><p>也可以把循环拆开写，无外乎只是左边计算一次，右边计算一次。AC代码：</p><pre><code>class Solution {public:    vector&lt;int&gt; productExceptSelf(vector&lt;int&gt;&amp; nums) {        int n = nums.size();        vector&lt;int&gt; ans(n,1);        for(int i = 0,t = 1; i &lt; n; i ++)ans[i] *= t, t *= nums[i];        for(int i = n-1,t = 1; i &gt;= 0; i --)ans[i] *= t, t *= nums[i];        return ans;    }};</code></pre><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>写惯了暴力后写带思路的题面有点僵硬，思维钝化了，需要多见见多想想这种题，多总结好，算是多种思路多种见识吧。挺有趣的，加油！</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;题目描述&quot;&gt;&lt;a href=&quot;#题目描述&quot; class=&quot;headerlink&quot; title=&quot;题目描述&quot;&gt;&lt;/a&gt;题目描述&lt;/h1&gt;&lt;p&gt;给一个含有n个数的数组nums，求一个新的数组ans，&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;ans[i] = $\prod_{j=1}^{n，i != j}$ nums[j]&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;时间复杂度O(n)，不能用除法，不考虑nums的情况下空间复杂度O(1).&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h1 id=&quot;解析&quot;&gt;&lt;a href=&quot;#解析&quot; class=&quot;headerlink&quot; title=&quot;解析&quot;&gt;&lt;/a&gt;解析&lt;/h1&gt;&lt;p&gt;想起来一句话，如果一道题附加了条件，或者改变数据量，会变成另一题。这个题如果数据量小，没有附加要求的话，可以直接暴力。时间复杂度是O($n^2$)。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+      <category term="Interesting_Interview" scheme="http://yoursite.com/tags/Interesting-Interview/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>&lt;LeetCode&gt; 878. Nth Magical Number</title>
+    <link href="http://yoursite.com/2019/09/23/Leetcode-878-BinSearch/"/>
+    <id>http://yoursite.com/2019/09/23/Leetcode-878-BinSearch/</id>
+    <published>2019-09-23T14:07:53.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="题目信息"><a href="#题目信息" class="headerlink" title="题目信息"></a>题目信息</h1><blockquote><p><a href="https://leetcode.com/problems/nth-magical-number/" target="_blank" rel="noopener">878. Nth Magical Number</a></p></blockquote><p>题目大意：</p><p>搜索第n个能被A或者B整除的数。</p><h1 id="解析"><a href="#解析" class="headerlink" title="解析"></a>解析</h1><p>这个题让我想起了Weekly Contest 155的第二题，就是当时没写出来的容斥那题，这题算是那题的简化，将第n个同时被三个数整除，改为同时被两个数整除。</p><p>顺手吐槽下难度分级方式，这题是 <strong>Hard</strong> 而，1201是 <strong>Medium</strong>。</p><a id="more"></a><p>整体思路及相似，首先计算一个数字x可以被A整除，加上可以被B整除，然后减去可以被A、B的最小公倍数整除，即可算出x里有k个数满足能被A或B整除。然后，很自然的对任意x’大于x的数，必有k’&gt;=k。满足二分的要求，然后利用二分把最优解转化成求可行解。</p><hr><h1 id="代码"><a href="#代码" class="headerlink" title="代码"></a>代码</h1><pre><code>typedef long long ll;class Solution {    const ll Mod = 1e9+7;    ll ab;    ll gcd(ll a,ll b){        return a % b == 0 ? b : gcd(b,a % b);    }    ll lcm(ll a, ll b){        return a / gcd(a,b) * b;    }    ll getNum(ll n,ll a, ll b){        return n / a + n / b - n / ab;    }public:    int nthMagicalNumber(int N, int A, int B) {        ab = lcm(A,B);        ll l = N * 1ll;        ll r = N * (ll)min(A,B);        ll mid;        while(l &lt; r){            mid = l + (r - l) / 2;            if(getNum(mid,A,B) &lt; N)l = mid + 1;            else r = mid;        }        return l % Mod;    }};</code></pre><hr><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>总体来说，就是容斥加二分。如果在做过WC155后仍然对这题写不出来，那就太不应该了。</p><p>可以关注下写二分查找的方法，利用左闭右开的特点来写二分。</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;题目信息&quot;&gt;&lt;a href=&quot;#题目信息&quot; class=&quot;headerlink&quot; title=&quot;题目信息&quot;&gt;&lt;/a&gt;题目信息&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/nth-magical-number/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;878. Nth Magical Number&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;题目大意：&lt;/p&gt;
+&lt;p&gt;搜索第n个能被A或者B整除的数。&lt;/p&gt;
+&lt;h1 id=&quot;解析&quot;&gt;&lt;a href=&quot;#解析&quot; class=&quot;headerlink&quot; title=&quot;解析&quot;&gt;&lt;/a&gt;解析&lt;/h1&gt;&lt;p&gt;这个题让我想起了Weekly Contest 155的第二题，就是当时没写出来的容斥那题，这题算是那题的简化，将第n个同时被三个数整除，改为同时被两个数整除。&lt;/p&gt;
+&lt;p&gt;顺手吐槽下难度分级方式，这题是 &lt;strong&gt;Hard&lt;/strong&gt; 而，1201是 &lt;strong&gt;Medium&lt;/strong&gt;。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+      <category term="BinarySearch" scheme="http://yoursite.com/tags/BinarySearch/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Leetcode Weekly Test 155</title>
+    <link href="http://yoursite.com/2019/09/22/Leetcode-Weekly-Contest-155/"/>
+    <id>http://yoursite.com/2019/09/22/Leetcode-Weekly-Contest-155/</id>
+    <published>2019-09-22T12:28:45.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="序幕"><a href="#序幕" class="headerlink" title="序幕"></a>序幕</h1><p>早上起来做Leetcode Contest 155，四题就做了两题出来，太逊了。。。以后的打算是争Rank的，现在才做两题。。。先整理下吧</p><h1 id="1200-Minimum-Absolute-Difference"><a href="#1200-Minimum-Absolute-Difference" class="headerlink" title="1200. Minimum Absolute Difference"></a>1200. Minimum Absolute Difference</h1><blockquote><p><a href="https://leetcode.com/problems/minimum-absolute-difference/" target="_blank" rel="noopener">1200. Minimum Absolute Difference</a></p></blockquote><p>题目大意：<br>在一个元素不等的数组里，输出绝对值最小的所有对。</p><p>解法：<br>按理说，第一题一般都是可以暴力的。直接对数组排序，然后比较相邻的绝对值，如果小于记录值则更新，等于记录值则添加。最终返回答案。</p><a id="more"></a><p>代码：</p><pre><code>class Solution {    int minn = 1e7;    vector &lt;vector&lt;int&gt;&gt; now;public:    vector&lt;vector&lt;int&gt;&gt; minimumAbsDifference(vector&lt;int&gt;&amp; arr) {        sort(arr.begin(), arr.end());        for(int i = 1; i &lt; arr.size(); i ++){            int c = abs(arr[i] - arr[i-1]);            if(c &lt; minn){                minn = c;                now.clear();                now.push_back({arr[i-1], arr[i]});            }            else if(c == minn){                now.push_back({arr[i-1], arr[i]});            }        }        return now;    }};</code></pre><hr><p>#1201. Ugly Number III #</p><blockquote><p><a href="https://leetcode.com/problems/ugly-number-iii/" target="_blank" rel="noopener">1201. Ugly Number III</a></p></blockquote><p>题目大意：<br>寻找第n个，能被a<strong>或</strong>被b<strong>或</strong>被c整除的数。</p><ul><li>1 &lt;= n, a, b, c &lt;= 10^9</li><li>1 &lt;= a * b * c &lt;= 10^18</li><li>It’s guaranteed that the result will be in range [1, 2 * 10^9]</li></ul><p>没做出来。。。这个数据范围是不可能暴力的，那么一般降低数据范围的手段有二分，可怎么二分呢？容斥这个点我是真的当时没想到，看到了题解才想起来，之前学的概率全还回去了。。。哎，菜啊。。。</p><p>看了题解后的代码：</p><pre><code>typedef long long ll;class Solution {    ll ab,ac,bc,abc;    ll gcd(ll x, ll y){        if(x % y == 0)return y;        return gcd(y, x%y);    }        ll lcm(ll x,ll y){        return x / gcd(x,y) * y;    }    ll getNum(ll n,ll a,ll b,ll c){        return n/a + n/b + n/c -n/ab - n/ac - n/bc + n/abc;    }public:    int nthUglyNumber(int n, int a, int b, int c) {        if(a == 1 || b == 1 || c == 1 )return n;        ab = lcm(a,b);        ac = lcm(a,c);        bc = lcm(c,b);        abc = lcm(ab,c);        ll r = n * min(min(a,b),c);        ll l = n;        while(l &lt;= r){            ll mid = l + (r - l) / 2;            if(getNum(mid, a, b, c) &lt; n)                l = mid + 1;            else r = mid - 1;        }        return l;    }};</code></pre><hr><h1 id="1202-Smallest-String-With-Swaps"><a href="#1202-Smallest-String-With-Swaps" class="headerlink" title="1202. Smallest String With Swaps"></a>1202. Smallest String With Swaps</h1><blockquote><p><a href="https://leetcode.com/problems/smallest-string-with-swaps/" target="_blank" rel="noopener">https://leetcode.com/problems/smallest-string-with-swaps/</a></p></blockquote><p>题目大意：<br>给一个字符串，和一些下标数值对。可以将下标对的元素交换位置。<br>例如:</p><pre><code>Input: s = &quot;cba&quot;, pairs = [[0,1],[1,2]]Output: &quot;abc&quot;Explaination: Swap s[0] and s[1], s = &quot;bca&quot;Swap s[1] and s[2], s = &quot;bac&quot;Swap s[0] and s[1], s = &quot;abc&quot;</code></pre><p>解法:</p><p>我的想法可能比较复杂，通过并查集来做。我看有使用不同方法的，这里通过样例可以看出，(0,1)(1,2)联通则(0，2)也是联通的。那么并查集可以处理这种问题。但我的处理方式可能有些复杂。</p><p>首先用并查集找到哪些节点在一棵树上的，然后把这些节点对应的字符整理出来进行排序，之后再扫描一遍字符串查询到所属输，依次取出排序后的字符。</p><p>代码：</p><pre><code>class Solution {    int f[100010],cnt[100010];    vector &lt; string &gt; k;    int p[100010];public:    int Find(int t){        return f[t] == t ?  t : f[t] = Find(f[t]);    }    void init(int n){        for(int i = 0; i &lt; n; ++ i)f[i] = i;    }    string smallestStringWithSwaps(string s, vector&lt;vector&lt;int&gt;&gt;&amp; pairs) {             int n = s.size();                k.resize(n);            init(n);            for(auto it : pairs){                int l = min(it[0],it[1]);                int r = max(it[1],it[0]);                 l = Find(l);                 r = Find(r);                if(l == r)continue;                f[l] = r;            }            for(int i = 0; i &lt; n; ++ i)f[i] = Find(i);            for(int i = 0; i &lt; n; ++ i)k[f[i]] += s[i];            for(int i = 0; i &lt; n; ++ i)                    if(k[i].size() &gt; 1)                        sort(k[i].begin(), k[i].end());            string ans = &quot;&quot;;            for(int i = 0; i &lt; n; ++ i){                int t = f[i];                int num = p[t] ++;                ans += k[t][num];            }            return ans;    }};</code></pre><p>重新交了下，看效率好像还行。。。就是感觉写的好繁杂，不简洁。</p><pre><code>Accepted    164 ms    49.1 MB    cppRuntime: 164 ms, faster than 90.00% of C++ online submissions for Smallest String With Swaps.Memory Usage: 49.1 MB, less than 100.00% of C++ online submissions for Smallest String With Swaps.</code></pre><hr><h1 id="1203-Sort-Items-by-Groups-Respecting-Dependencies"><a href="#1203-Sort-Items-by-Groups-Respecting-Dependencies" class="headerlink" title="1203. Sort Items by Groups Respecting Dependencies"></a>1203. Sort Items by Groups Respecting Dependencies</h1><blockquote><p><a href="https://leetcode.com/problems/sort-items-by-groups-respecting-dependencies/" target="_blank" rel="noopener">1203. Sort Items by Groups Respecting Dependencies</a></p></blockquote><p>Todo:看都没看。。。之后补吧</p><h1 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h1><p>感觉还是太菜了，尽管也有些客观原因，但是还是觉得不该写这么差。同时，这种记录方式觉得不太好，总觉得有种为了记录而记录，没有那么强的总结的效果。走着看吧~</p><p>加油~话说，可以在算法专题里套用一句bin神(kuangbin大佬)的话。</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;序幕&quot;&gt;&lt;a href=&quot;#序幕&quot; class=&quot;headerlink&quot; title=&quot;序幕&quot;&gt;&lt;/a&gt;序幕&lt;/h1&gt;&lt;p&gt;早上起来做Leetcode Contest 155，四题就做了两题出来，太逊了。。。以后的打算是争Rank的，现在才做两题。。。先整理下吧&lt;/p&gt;
+&lt;h1 id=&quot;1200-Minimum-Absolute-Difference&quot;&gt;&lt;a href=&quot;#1200-Minimum-Absolute-Difference&quot; class=&quot;headerlink&quot; title=&quot;1200. Minimum Absolute Difference&quot;&gt;&lt;/a&gt;1200. Minimum Absolute Difference&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/minimum-absolute-difference/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;1200. Minimum Absolute Difference&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;题目大意：&lt;br&gt;在一个元素不等的数组里，输出绝对值最小的所有对。&lt;/p&gt;
+&lt;p&gt;解法：&lt;br&gt;按理说，第一题一般都是可以暴力的。直接对数组排序，然后比较相邻的绝对值，如果小于记录值则更新，等于记录值则添加。最终返回答案。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Leetcode Weekly Contest 154</title>
+    <link href="http://yoursite.com/2019/09/21/Leetcode-Weekly-Contest-154/"/>
+    <id>http://yoursite.com/2019/09/21/Leetcode-Weekly-Contest-154/</id>
+    <published>2019-09-21T14:42:45.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="前情提要"><a href="#前情提要" class="headerlink" title="前情提要"></a>前情提要</h1><p>本来早上打算起来参加Weekly Contest的，结果起来发现，时间是晚上10点30开始，也就是现在这个时间正在进行，但是，1个小时前就已经困了，刚刚把BugKu的内容整理出来，实在没精力再去做了，以后做模拟吧。临睡前把今天上午模拟的周赛154的四题整理一下。</p><h1 id="1189-Maximum-Number-of-Balloons"><a href="#1189-Maximum-Number-of-Balloons" class="headerlink" title="1189. Maximum Number of Balloons"></a>1189. Maximum Number of Balloons</h1><p><a href="https://leetcode.com/problems/maximum-number-of-balloons/" target="_blank" rel="noopener">Maximum Number of Balloons</a></p><p>题目大意：<br>给一个字符串，询问能从这个字符串中取字符，每个字符至多取一次，可以拼成多少个”balloon”</p><a id="more"></a><h2 id="解法"><a href="#解法" class="headerlink" title="解法"></a>解法</h2><p>直接模拟，找木板最短的那一块。</p><pre><code>class Solution {public:int maxNumberOfBalloons(string text) {    map &lt;char,int&gt; ha;    for(int i = 0; i &lt; text.size(); i ++){        ++ ha[text[i]];    }    int ans = 1100000;    ans = min(ans, ha[&apos;b&apos;]);    ans = min(ans, ha[&apos;a&apos;]);    ans = min(ans, ha[&apos;n&apos;]);    ans = min(ans, (ha[&apos;l&apos;] / 2) );    ans = min(ans, (ha[&apos;o&apos;] / 2) );    return ans;        }};</code></pre><hr><h1 id="1190-Reverse-Substrings-Between-Each-Pair-of-Parentheses"><a href="#1190-Reverse-Substrings-Between-Each-Pair-of-Parentheses" class="headerlink" title="1190. Reverse Substrings Between Each Pair of Parentheses"></a>1190. Reverse Substrings Between Each Pair of Parentheses</h1><p><a href="https://leetcode.com/problems/reverse-substrings-between-each-pair-of-parentheses/" target="_blank" rel="noopener">Reverse Substrings Between Each Pair of Parentheses</a></p><p>题目大意：</p><p>给一个字符串s，里面只有英文字符和小括号。现在要做的是根据平时的运算规则，对每个括号内的字符串进行反转。<br>数据规模：0 &lt;= s.length &lt;= 2000</p><h2 id="解法1：-暴力"><a href="#解法1：-暴力" class="headerlink" title="解法1： 暴力"></a>解法1： 暴力</h2><p>这数据规模可以放心的暴力.即，每次读入一个’(‘,遇到一个’)’时，进行反转。最后将小括号过滤掉。</p><pre><code>class Solution {public:    string reverseParentheses(string s) {        vector&lt;int&gt; brack;        for(int i = 0; i &lt; s.size();  ++ i){            if(s[i] == &apos;(&apos;)                brack.emplace_back(i);            else if(s[i] == &apos;)&apos;){                int j = brack[ brack.size() - 1];                brack.pop_back();                for(int l = j,r = i; l &lt; r; ++ l,--r){                    swap(s[l], s[r]);                }            }        }        string ans = fin(s);        return ans;    }    string fin(string s){        string ans = &quot;&quot;;        for(auto it : s ){            if(it != &apos;(&apos; &amp;&amp; it != &apos;)&apos;)                ans += it;        }        return ans;    }};</code></pre><p>代码有点乱，没有整理，顺便我也不知道当时怎么想起来还写一个fin函数。0.0</p><h2 id="解法2-优化"><a href="#解法2-优化" class="headerlink" title="解法2 优化"></a>解法2 优化</h2><p>写完后，感觉这道题应该还可以优化，于是去翻Discuss，果然看到dalao提出了一个O(len)的写法。</p><p>详情见链接<br><a href="https://leetcode.com/problems/reverse-substrings-between-each-pair-of-parentheses/discuss/383670/JavaC%2B%2BPython-Why-not-O(N)" target="_blank" rel="noopener">解法2 优化</a></p><p>思路挺清晰的，记录每一对的对应位置(左括号对应右括号，右括号对应左括号)。首先从左往右搜索，当遇到一个括号，即切到对应括号位置，因为要反转，直接将搜索顺序取反。直到遇到下一个括号，继续切到对应括号位置，再将搜索方向取反。最终完成。</p><hr><h1 id="1191-K-Concatenation-Maximum-Sum"><a href="#1191-K-Concatenation-Maximum-Sum" class="headerlink" title="1191. K-Concatenation Maximum Sum"></a>1191. K-Concatenation Maximum Sum</h1><p><a href="https://leetcode.com/problems/k-concatenation-maximum-sum/" target="_blank" rel="noopener">1191. K-Concatenation Maximum Sum </a></p><p>题目大意：<br>给一个数组arr，将K个arr数组首尾先连，求最大连续串和。</p><p>解法：</p><p>首先，如果发现对一个arr求和，发现和大于0。</p><p>那可以从第2个到第k-1(k &gt; 2)个，全取了，正数相加肯定越来越大，然后对第1个求最大后缀和，对第k个求最大前缀和，相加去摸即可。</p><p>如果arr求和小于0，那最大连续串和肯定在一个arr里或者在两个arr的连接处。那么对两个arr求最大连续串和即可。</p><p>注意前边k&gt;2，我提前算了一个arr的最大连续和，进行了特判。感觉，我的代码还是可以再优化下。。。</p><pre><code>typedef long long ll;const ll Mod = 1e9 + 7;class Solution {public:    int kConcatenationMaxSum(vector&lt;int&gt;&amp; arr, int k) {        ll sum,now,ans;        sum = now = ans = 0ll;        for(int i = 0; i &lt; arr.size(); ++ i){            sum += arr[i];            now += arr[i];            if(now &gt; ans)ans = now;            if(now &lt; 0)now = 0;        }        if(k == 1)return ans % Mod;        if(sum &gt; 0 &amp;&amp; k &gt; 2){            ans = sum;            ans %= Mod;            ans = ans * (k-2) % Mod;            int m,now,i;            for(i = 0,now = 0,m = 0; i &lt; arr.size(); ++ i){                now += arr[i];                if(now &gt; m)m = now;            }            ans += m;            ans %= Mod;             for(i = arr.size()-1,now = 0,m = 0; i &gt;= 0 ; -- i){                now += arr[i];                if(now &gt; m)m = now;            }             ans += m;            ans %= Mod;            return ans;        }        if(sum &lt;= 0 || k == 2){            for(int i = 0,now = 0ll; i &lt; arr.size() * 2; ++ i){            now += arr[i % arr.size()];            if(now &gt; ans)ans = now;            if(now &lt; 0)now = 0;            }            return ans % Mod;        }        return ans % Mod;    }};</code></pre><hr><h1 id="1192-Critical-Connections-in-a-Network"><a href="#1192-Critical-Connections-in-a-Network" class="headerlink" title="1192. Critical Connections in a Network"></a>1192. Critical Connections in a Network</h1><p><a href="https://leetcode.com/problems/critical-connections-in-a-network/" target="_blank" rel="noopener">Critical Connections in a Network</a></p><p>题目大意：<br>图论问题，切除一条边，增加联通图个数。应该算是裸的模板题。<br>然后，模板没带来0.0，加上要么学了的图论早就忘完，要么有些没学。。。哎，补吧。。。</p><p>查了下资料，Tarjan算法可以解决。</p><p>大致思路：</p><ul><li><p>Tarjan在解决无向图的割边时，差不多就是DFS，只是同时维护着两个数组。</p></li><li><p>对n个点，点从0到n-1的图来说。</p></li><li><p>一个数组是dfn，这个数组是不变化的，dfn[i]表示以某一点为起始点，走到i点时的位置或者说是序数。</p></li><li><p>一个数组是val，这个数组是会变化的，val[i]表示能到达i的最小序数点。比如按DFS走过的路，第二个点和第五个点都可以走到i，则val[i] = 2;</p></li></ul><p>算法过程</p><ol><li>首先任意选一个点u进行DFS，判断该点的联通点v是否没有走过，认为u是v的父节点。</li><li>如果联通点v没有走过，则进入</li><li>如果联通点v已经走过，且联通点v非该点u的父节点，则判断val[u]与val[v]大小来维护更新val[u]，然后回溯。如果不存在v点也回溯。</li><li>回溯时更新u点，寻找u点所有联通点v的val[v]最小值，并更新。</li><li>如果发现，dfn[u]的值大于等于val[u]的值，表示该点在环内，即至少两个点可以以不同方向到达u。否则为环外点，即为题目中要求的点。</li></ol><pre><code>class Solution {public:    vector&lt; vector&lt;int&gt; &gt; edg,ans;vector&lt; int &gt; val,dfn;    vector&lt;vector&lt;int&gt;&gt; criticalConnections(int n, vector&lt;vector&lt;int&gt;&gt;&amp; connections) {        edg.resize(n);        val.resize(n);        dfn.resize(n);        for(auto it : connections){            edg[it[0]].push_back(it[1]);            edg[it[1]].push_back(it[0]);        }        for(int i = 0; i &lt; n; ++ i){            if( !dfn[i] )                dfs(i,-1);        }        return ans;    }    void dfs(int u,int p){        static int cnt = 0;        val[u] = dfn[u] = ++cnt;        for(auto v : edg[u]){            if( !dfn[v] ){                dfs(v,u);                val[u] = min(val[u], val[v]);                if(val[v] &gt; dfn[u]){                    ans.push_back({v,u});                }            }            else if(v != p)                val[u] = min(val[u], val[v]);        }    }};</code></pre><hr><h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>感觉Leetcode还是要比CF简单点，但对我这种长时间没写过代码，以前喜欢拍模板的人来说，能收获不少东西。就是这个表达，不知道能不能锻炼起来。0.0</p><p>加油吧~</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;前情提要&quot;&gt;&lt;a href=&quot;#前情提要&quot; class=&quot;headerlink&quot; title=&quot;前情提要&quot;&gt;&lt;/a&gt;前情提要&lt;/h1&gt;&lt;p&gt;本来早上打算起来参加Weekly Contest的，结果起来发现，时间是晚上10点30开始，也就是现在这个时间正在进行，但是，1个小时前就已经困了，刚刚把BugKu的内容整理出来，实在没精力再去做了，以后做模拟吧。临睡前把今天上午模拟的周赛154的四题整理一下。&lt;/p&gt;
+&lt;h1 id=&quot;1189-Maximum-Number-of-Balloons&quot;&gt;&lt;a href=&quot;#1189-Maximum-Number-of-Balloons&quot; class=&quot;headerlink&quot; title=&quot;1189. Maximum Number of Balloons&quot;&gt;&lt;/a&gt;1189. Maximum Number of Balloons&lt;/h1&gt;&lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/maximum-number-of-balloons/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Maximum Number of Balloons&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;题目大意：&lt;br&gt;给一个字符串，询问能从这个字符串中取字符，每个字符至多取一次，可以拼成多少个”balloon”&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>BugKu-Web-WriteUp-From-Pro9-to-Pro14</title>
+    <link href="http://yoursite.com/2019/09/21/BugKu-Web-WriteUp-From-Pro9-to-Pro14/"/>
+    <id>http://yoursite.com/2019/09/21/BugKu-Web-WriteUp-From-Pro9-to-Pro14/</id>
+    <published>2019-09-21T13:50:48.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="花絮"><a href="#花絮" class="headerlink" title="花絮"></a>花絮</h1><p>上次是Pr0到Pr7，这次是Pro9开始，为什么呢？因为第八题还是没能正常打开0.0 不过文件包含类漏洞是要好好总结归纳下，不然就像无头苍蝇一样，任意试，成功与否全看脸就不好了。。。</p><h1 id="Pro9-变量一"><a href="#Pro9-变量一" class="headerlink" title="Pro9  变量一"></a>Pro9  变量一</h1><blockquote><p><a href="http://123.206.87.240:8004/index1.php" target="_blank" rel="noopener">http://123.206.87.240:8004/index1.php</a></p></blockquote><p>算是小的代码分析吧，根据题面Flag在变量里。然后看代码，最后显示的是<code>eval(&quot;var_dump($$args);&quot;);</code>里面的变量是<code>$$args</code>表示这是一个可变变量。对可变变量的认识大概就是一个变量的值可以变成另一个变量的键。比如如果<code>$args = x,$x = 5</code>,则<code>$$args = $($args) = $x = 5</code>.可以把数值变成变量名，感觉挺有趣的。再结合在变量内，使用<code>GLOBALS</code>可以显示出全部全局变量。</p><p>构造：<br><code>http://123.206.87.240:8004/index1.php?args=GLOBALS</code></p><p>可以看到<code>flag{92853051ab894a64f7865cf3c2128b34}</code></p><hr><h1 id="Pro10-Web5"><a href="#Pro10-Web5" class="headerlink" title="Pro10 Web5"></a>Pro10 Web5</h1><blockquote><p>JSPFUCK??????答案格式CTF{**}</p><p><a href="http://123.206.87.240:8002/web5/" target="_blank" rel="noopener">http://123.206.87.240:8002/web5/</a></p><p>字母大写</p></blockquote><a id="more"></a><p>直接查看源代码，发现一堆加密信息。正好前不久在知乎看到如何有格调显示Hello World。大概见过这种形式的代码，记得是直接拉到<code>Concole</code>里回车后看到Flag。</p><pre><code>ctf{whatfk}</code></pre><p>注意根据题目要求要全部换成大写！</p><hr><h1 id="Pro11-头等舱"><a href="#Pro11-头等舱" class="headerlink" title="Pro11 头等舱"></a>Pro11 头等舱</h1><blockquote><p><a href="http://123.206.87.240:9009/hd.php" target="_blank" rel="noopener">http://123.206.87.240:9009/hd.php</a></p></blockquote><p>里面显示什么都没有，再加上看到头等舱。以前做过这种题，Flag当时是在HTTP请求里。查看，发现Flag为<code>flag{Bugku_k8_23s_istra}</code></p><hr><h1 id="Pro12-网站被黑"><a href="#Pro12-网站被黑" class="headerlink" title="Pro12 网站被黑"></a>Pro12 网站被黑</h1><blockquote><p><a href="http://123.206.87.240:8002/webshell/" target="_blank" rel="noopener">http://123.206.87.240:8002/webshell/</a></p></blockquote><blockquote><p>这个题没技术含量但是实战中经常遇到</p></blockquote><p>没思路，现在不敢实战或者说没在国外找到那么弱的站。查题解。</p><p>大概模拟了下什么样子，用御剑扫了下后台，找到有一个叫shell.php，进去后是个后台。随便试了下密码不对，用Brup里的intruder爆破，成功找到密码是hack，输入后看到<code>flag{hack_bug_ku035}</code></p><hr><h1 id="Pro13-管理员系统"><a href="#Pro13-管理员系统" class="headerlink" title="Pro13 管理员系统"></a>Pro13 管理员系统</h1><blockquote><p><a href="http://123.206.31.85:1003/" target="_blank" rel="noopener">http://123.206.31.85:1003/</a></p></blockquote><blockquote><p>flag格式flag{}</p></blockquote><p>随便输信息，显示”IP禁止访问，请联系本地管理员登陆，IP已被记录.”没思路，查题解。。。</p><p>这种绕过IP限制可以用XFF(X-Forwarded-For)来欺骗。在请求里添加X-Forwarded-For: 127.0.0.1，在Response里看HTML可以看到一条注释，被Base64加密。解得为秘密：<code>test123</code>配合用户名:<code>amdin</code>最后得到<code>The flag is: 85ff2ee4171396724bae20c0bd851f6b</code>。整理格式后即可输入。</p><hr><h1 id="Pro14-Web4"><a href="#Pro14-Web4" class="headerlink" title="Pro14  Web4"></a>Pro14  Web4</h1><blockquote><p>看看源代码吧</p><p><a href="http://123.206.87.240:8002/web4/" target="_blank" rel="noopener">http://123.206.87.240:8002/web4/</a></p></blockquote><p>让看源码，查看后发现被加密过，根据代码，把三段代码扔进Decoder里，经过URL解密。取得一串神秘字符串<code>67d709b2b54aa2aa648cf6e87a7114f1</code>，最开始神经兮兮的试着去MD5解密，成功然后换ID为password提交请求，出错了。。。然后想想，没有加密的代码啊，字符串改回原样，一样出错。然后又把ID改为flag，成功<code>KEY{J22JK-HS11}</code></p><p>感觉我语言好像学的有点飘啊。。。</p><hr><h1 id="后记"><a href="#后记" class="headerlink" title="后记"></a>后记</h1><p>今天做的少，因为也在做Leetcode。相比较上次而言，要更多次尝试更多次看题解了<del>~ (扶额) ~</del> 后面的题目好像开始有更难更专题的内容了，这样才好玩才能学到更多的东西吧，感觉我这个系列做得挺入门的，毕竟自己也只是正在入门嘛0.0</p><p>加油吧~</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;花絮&quot;&gt;&lt;a href=&quot;#花絮&quot; class=&quot;headerlink&quot; title=&quot;花絮&quot;&gt;&lt;/a&gt;花絮&lt;/h1&gt;&lt;p&gt;上次是Pr0到Pr7，这次是Pro9开始，为什么呢？因为第八题还是没能正常打开0.0 不过文件包含类漏洞是要好好总结归纳下，不然就像无头苍蝇一样，任意试，成功与否全看脸就不好了。。。&lt;/p&gt;
+&lt;h1 id=&quot;Pro9-变量一&quot;&gt;&lt;a href=&quot;#Pro9-变量一&quot; class=&quot;headerlink&quot; title=&quot;Pro9  变量一&quot;&gt;&lt;/a&gt;Pro9  变量一&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;http://123.206.87.240:8004/index1.php&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http://123.206.87.240:8004/index1.php&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;算是小的代码分析吧，根据题面Flag在变量里。然后看代码，最后显示的是&lt;code&gt;eval(&amp;quot;var_dump($$args);&amp;quot;);&lt;/code&gt;里面的变量是&lt;code&gt;$$args&lt;/code&gt;表示这是一个可变变量。对可变变量的认识大概就是一个变量的值可以变成另一个变量的键。比如如果&lt;code&gt;$args = x,$x = 5&lt;/code&gt;,则&lt;code&gt;$$args = $($args) = $x = 5&lt;/code&gt;.可以把数值变成变量名，感觉挺有趣的。再结合在变量内，使用&lt;code&gt;GLOBALS&lt;/code&gt;可以显示出全部全局变量。&lt;/p&gt;
+&lt;p&gt;构造：&lt;br&gt;&lt;code&gt;http://123.206.87.240:8004/index1.php?args=GLOBALS&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;可以看到&lt;code&gt;flag{92853051ab894a64f7865cf3c2128b34}&lt;/code&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&quot;Pro10-Web5&quot;&gt;&lt;a href=&quot;#Pro10-Web5&quot; class=&quot;headerlink&quot; title=&quot;Pro10 Web5&quot;&gt;&lt;/a&gt;Pro10 Web5&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;JSPFUCK??????答案格式CTF{**}&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://123.206.87.240:8002/web5/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http://123.206.87.240:8002/web5/&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;字母大写&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/categories/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/categories/Sec/CTF/"/>
+    
+      <category term="Web题目" scheme="http://yoursite.com/categories/Sec/CTF/Web%E9%A2%98%E7%9B%AE/"/>
+    
+      <category term="BugKu" scheme="http://yoursite.com/categories/Sec/CTF/Web%E9%A2%98%E7%9B%AE/BugKu/"/>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/tags/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/tags/CTF/"/>
+    
+      <category term="Web" scheme="http://yoursite.com/tags/Web/"/>
+    
+      <category term="BugKu" scheme="http://yoursite.com/tags/BugKu/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>BugKu Web WriteUp From Pro0 To Pro7</title>
+    <link href="http://yoursite.com/2019/09/20/BugKu-Web-WriteUp-From-Pro0-to-Pro7/"/>
+    <id>http://yoursite.com/2019/09/20/BugKu-Web-WriteUp-From-Pro0-to-Pro7/</id>
+    <published>2019-09-20T13:16:35.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="准备"><a href="#准备" class="headerlink" title="准备"></a>准备</h1><p>晚上做了点CTF的Web题目，本来是跑了一天想看会B站的，结果发现有dalao在B站上传了做BugKu CTF的视频，emmmm，思考了几秒，决定我也去试试=。= 因为就算不会做也有可以参考的东西啊，于是做了8题入门题。感觉目前难度不高，因为没涉及到常用的漏洞原理，但也挺有趣的0.0，以下是前8道题的解题方法和Flag</p><hr><h1 id="Pro0-Web2"><a href="#Pro0-Web2" class="headerlink" title="Pro0  Web2"></a>Pro0  Web2</h1><blockquote><p>听说聪明的人都能找到答案</p><p><a href="http://123.206.87.240:8002/web2/" target="_blank" rel="noopener">http://123.206.87.240:8002/web2/</a></p></blockquote><p>点击开，一堆滑稽铺面而来。也算之前养成了Ctrl+Shift+I的习惯，<br>选中 <code>Elements</code>直接能看到。</p><pre><code>&lt;!--flag KEY{Web-2-bugKssNNikls9100}--&gt;</code></pre><hr><h1 id="Pro1-计算器"><a href="#Pro1-计算器" class="headerlink" title="Pro1 计算器"></a>Pro1 计算器</h1><blockquote><p><a href="http://123.206.87.240:8002/yanzhengma/" target="_blank" rel="noopener">http://123.206.87.240:8002/yanzhengma/</a></p></blockquote><p>点开，是算数题。很乖的去输了结果，发现结果是两位数，但只能输进去1位数字。继续打开开发者工具。在 <code>Sources</code>里看到了 <code>Code.js</code> 打开，直接显示了  <code>alert(&quot;flag{CTF-bugku-0032}&quot;);</code></p><hr><h1 id="Pro2-web基础-GET"><a href="#Pro2-web基础-GET" class="headerlink" title="Pro2 web基础$_GET"></a>Pro2 web基础$_GET</h1><blockquote><p><a href="http://123.206.87.240:8002/get/" target="_blank" rel="noopener">http://123.206.87.240:8002/get/</a></p></blockquote><p>看名字和给的代码。Get可以直接通过URL构造。</p><a id="more"></a><pre><code>http://123.206.87.240:8002/get/?what=flag</code></pre><p>得到Flag： <code>flag{bugku_get_su8kej2en}</code></p><hr><h1 id="Pro3-web基础-POST"><a href="#Pro3-web基础-POST" class="headerlink" title="Pro3 web基础$_POST"></a>Pro3 web基础$_POST</h1><blockquote><p> <a href="http://123.206.87.240:8002/post/" target="_blank" rel="noopener">http://123.206.87.240:8002/post/</a></p></blockquote><p>这题硬是没用Burp构造好POST，总是长度不对。明明length=9，构造的要么是11要么是13.改用之前的Hackbar成功获得Flag，然后对比发现应该是多了回车0.0<br>同时对比发现POST比GET多了一个 <code>Content-Type: application/x-www-form-urlencoded</code> 嗯，这是告诉我，HTTP没学好<del>(别说那么好听，明明几乎没学过好吧0.0)</del><br>最终Flag为 <code>flag{bugku_get_ssseint67se}</code></p><hr><h1 id="Pro4-矛盾"><a href="#Pro4-矛盾" class="headerlink" title="Pro4 矛盾"></a>Pro4 矛盾</h1><blockquote><p> <a href="http://123.206.87.240:8002/get/index1.php" target="_blank" rel="noopener">http://123.206.87.240:8002/get/index1.php</a></p></blockquote><p>这题觉得挺好玩，有点像比较基础正常的安全问题，但是。。。我一开始没想到0.0，这题是看到了WriteUp才知道的。一开始一直以为，is_numeric这个函数有别的方法绕过，也就是说，一个变量内容是数字但函数不认。我记得有个语言的等于就可以这样绕过，还有SSRF也有类似协调不一致导致的问题<del>（只是模糊记得，但不准确）</del></p><p>结果发现是用 <code>1==1 |</code>类似的逻辑运算绕过。因为num没有加任何过滤，直接进行比较，再加上可以用or的运算规则，但前一个为真时，直接为真。最终得到 <code>flag{bugku-789-ps-ssdf}</code></p><hr><h1 id="Pro5-Web3"><a href="#Pro5-Web3" class="headerlink" title="Pro5 Web3"></a>Pro5 Web3</h1><blockquote><p>flag就在这里快来找找吧</p><p><a href="http://123.206.87.240:8002/web3/" target="_blank" rel="noopener">http://123.206.87.240:8002/web3/</a></p></blockquote><p>做题时一直开着Burp，找到第一个GET请求。在Response里一直往下拉。可以直接看到Flag。发现经过了HTML加密。直接拖进Decoder里，解密即得。<br> <code>KEY{J2sa42ahJK-HS11III}</code></p><hr><h1 id="Pro6-域名解析"><a href="#Pro6-域名解析" class="headerlink" title="Pro6 域名解析"></a>Pro6 域名解析</h1><blockquote><p>听说把 flag.baidu.com 解析到123.206.87.240 就能拿到flag</p></blockquote><p>因为之前在搞DNS Tunneling，所以第一时间是觉得要改hosts.<br>找到hosts文件，在最后添加上 <code>123.206.87.240 flag.baidu.com</code> 然后直接访问flag.baidu.com成功拿到Flag 为<code>KEY{DSAHDSJ82HDS2211}</code></p><p>这题我想过能不能用Burp来添加某项属性来绕过，但发现，我没成功。看到网上成功的WriteUp，但是他们当时的域名不是baidu.com，而是bugku.com，我试着把他们的请求直接修改host访问，发现依然是失败的。这个不清楚怎么回事。。。</p><hr><h1 id="Pro7-你必须让他停下"><a href="#Pro7-你必须让他停下" class="headerlink" title="Pro7 你必须让他停下"></a>Pro7 你必须让他停下</h1><blockquote><p> <a href="http://123.206.87.240:8002/web12/" target="_blank" rel="noopener">http://123.206.87.240:8002/web12/</a></p></blockquote><p>挺好完的题目，拉到Repeater里试图添加参数来枚举每个图片也不行。最后一直点Go想看看，发现在10.jpg时成功看到Flag为 <code>flag{dummy_game_1s_s0_popular}</code> 0.0老实说，不知道是怎么回事的。。。是要拼人品嘛。。。0.0</p><hr><h1 id="番外"><a href="#番外" class="headerlink" title="番外"></a>番外</h1><p>其实我还打算做第九题，本地包含。感觉这像是往正常的网络安全开始递进了，打开一看，错误页面0.0，线索在里面吗？找啊找，翻啊翻，尽管文件包含类的问题做的不精，但至少也是做过一两道的，我记得这个要提交数据的啊，这压根就没地方提啊。没办法，搜题解吧。。。发现。。。他们做的和我遇到的不是一个界面，好吧，估计是这题崩了。。。题解就没往下看，等之后先自己做做，不会再看吧~</p><hr><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>题目不难，但对我这样实践经验很少的人来说，还是挺有趣的，争取刷完吧。也尽量从中多学习多收获些东西，尽快建立起比较系统点的知识体系。</p><p>加油吧~</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;准备&quot;&gt;&lt;a href=&quot;#准备&quot; class=&quot;headerlink&quot; title=&quot;准备&quot;&gt;&lt;/a&gt;准备&lt;/h1&gt;&lt;p&gt;晚上做了点CTF的Web题目，本来是跑了一天想看会B站的，结果发现有dalao在B站上传了做BugKu CTF的视频，emmmm，思考了几秒，决定我也去试试=。= 因为就算不会做也有可以参考的东西啊，于是做了8题入门题。感觉目前难度不高，因为没涉及到常用的漏洞原理，但也挺有趣的0.0，以下是前8道题的解题方法和Flag&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&quot;Pro0-Web2&quot;&gt;&lt;a href=&quot;#Pro0-Web2&quot; class=&quot;headerlink&quot; title=&quot;Pro0  Web2&quot;&gt;&lt;/a&gt;Pro0  Web2&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;听说聪明的人都能找到答案&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://123.206.87.240:8002/web2/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http://123.206.87.240:8002/web2/&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;点击开，一堆滑稽铺面而来。也算之前养成了Ctrl+Shift+I的习惯，&lt;br&gt;选中 &lt;code&gt;Elements&lt;/code&gt;直接能看到。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;&amp;lt;!--flag KEY{Web-2-bugKssNNikls9100}--&amp;gt;&lt;/code&gt;&lt;/pre&gt;&lt;hr&gt;
+&lt;h1 id=&quot;Pro1-计算器&quot;&gt;&lt;a href=&quot;#Pro1-计算器&quot; class=&quot;headerlink&quot; title=&quot;Pro1 计算器&quot;&gt;&lt;/a&gt;Pro1 计算器&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;http://123.206.87.240:8002/yanzhengma/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http://123.206.87.240:8002/yanzhengma/&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;点开，是算数题。很乖的去输了结果，发现结果是两位数，但只能输进去1位数字。继续打开开发者工具。在 &lt;code&gt;Sources&lt;/code&gt;里看到了 &lt;code&gt;Code.js&lt;/code&gt; 打开，直接显示了  &lt;code&gt;alert(&amp;quot;flag{CTF-bugku-0032}&amp;quot;);&lt;/code&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;h1 id=&quot;Pro2-web基础-GET&quot;&gt;&lt;a href=&quot;#Pro2-web基础-GET&quot; class=&quot;headerlink&quot; title=&quot;Pro2 web基础$_GET&quot;&gt;&lt;/a&gt;Pro2 web基础$_GET&lt;/h1&gt;&lt;blockquote&gt;
+&lt;p&gt;&lt;a href=&quot;http://123.206.87.240:8002/get/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;http://123.206.87.240:8002/get/&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;看名字和给的代码。Get可以直接通过URL构造。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/categories/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/categories/Sec/CTF/"/>
+    
+      <category term="Web题目" scheme="http://yoursite.com/categories/Sec/CTF/Web%E9%A2%98%E7%9B%AE/"/>
+    
+      <category term="BugKu" scheme="http://yoursite.com/categories/Sec/CTF/Web%E9%A2%98%E7%9B%AE/BugKu/"/>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/tags/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/tags/CTF/"/>
+    
+      <category term="Web" scheme="http://yoursite.com/tags/Web/"/>
+    
+      <category term="BugKu" scheme="http://yoursite.com/tags/BugKu/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Ubuntu虚拟机安装Burpsuite_Pro_1.7.36记录</title>
+    <link href="http://yoursite.com/2019/09/19/Burpsuite-Pro%E5%AE%89%E8%A3%85/"/>
+    <id>http://yoursite.com/2019/09/19/Burpsuite-Pro安装/</id>
+    <published>2019-09-19T11:06:36.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="起因"><a href="#起因" class="headerlink" title="起因"></a>起因</h1><p>额，为什么想写这个呢？大概是因为去年安装Burp Suite破解版时费了好多事，感觉好麻烦。这个软件也确实好用<del>尽管现在不怎么会用</del>，所以以前想要记录下如果换电脑了该怎么安装，昨天在Ubuntu的虚拟机里安装了下，发现，好像也还行，之前没记录，这次就记录下吧。</p><h1 id="下载安装"><a href="#下载安装" class="headerlink" title="下载安装"></a>下载安装</h1><h2 id="Java环境"><a href="#Java环境" class="headerlink" title="Java环境"></a>Java环境</h2><p><a href="https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html" title="下载Java环境" target="_blank" rel="noopener">https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html</a>。注意需要登录，选择jar文件。下载时选中 Accept License Agreement。</p><p>之后敲入如下代码。</p><pre><code>tar -xzvf jdk-8u191-linux-i586.tar.gzmv jdk1.8.0_191/ /usr/local/lib/jvmcd /usr/local/libmv jvm jdk1.8export JAVA_HOME=/usr/local/lib/jdk1.8/ export JRE_HOME=JAVAHOME/jreexportCLASSPATH=.:{JAVA_HOME}/lib:JREHOME/libexportPATH={JAVA_HOME}/bin:$PATHupdate-alternatives --install /usr/bin/java java /usr/local/lib/jdk1.8/bin/java 1 update-alternatives --install /usr/bin/javac javac /usr/local/lib/jdk1.8/bin/javac 1update-alternatives --set java /usr/local/lib/jdk1.8/bin/javaupdate-alternatives --set javac /usr/local/lib/jdk1.8/bin/javacjava -version </code></pre><p>看到</p><blockquote><p>java -version</p><p>java version “1.8.0_221”</p></blockquote><blockquote><p>Java(TM) SE Runtime Environment (build 1.8.0_221-b11)</p></blockquote><blockquote><p>Java HotSpot(TM) 64-Bit Server VM (build 25.221-b11, mixed mode)</p></blockquote><p>就成功了。</p><h2 id="Burp-Suite"><a href="#Burp-Suite" class="headerlink" title="Burp Suite"></a>Burp Suite</h2><p>然后从官网下载Burp Suite。<a href="https://portswigger.net/burp" title="Burp" target="_blank" rel="noopener">https://portswigger.net/burp</a>。我是下载的Community版的，一是因为，Pro版本免费试用下载需要申请，我昨天晚上用edu学生邮箱申请了，现在还没看到下载链接。或许是我搞得有问题？二是，看了52pojie的帖子好像使用破解补丁后好像没影响。<em>（见参考链接1评论）</em></p><p>之后下载破解补丁。</p><p>我是之前从52pojie找到的补丁，然后<strong>好像</strong>找到了 原作者发布的补丁，之后比较了校验和。只记得相对来说应该算是比较可靠的，就用了之前备份的补丁。这里用到的是burp-loader-keygen.jar和burpsuite_pro_v1.7.36.jar.然后把<em>burpsuite_pro_v1.7.36.jar</em>改名为 <strong>burpsuite_community_v1.7.36.jar</strong></p><p>拉到虚拟机里和Burp放入同一个目录里。</p><pre><code>java -jar burp-loader-keygen.jar</code></pre><ol><li>点击<code>Run</code> <em>（可以先修改<code>License Text</code>）</em></li><li>复制 <code>License</code> 粘贴入输入框。然后 <code>Next</code></li><li>点击 <code>Manual activation</code></li><li>复制第二个文本框的内容或者 <code>Copy Request</code>，粘贴进 <code>License</code>下的文本框 <code>Activation Requests</code>里，在下边的框会自动生成内容。粘贴回注册的第三个文本框或者 <code>Paste response</code></li><li>然后，应该就OK了。</li></ol><p>之后启动也可以用 <code>java -jar burp-loader-keygen.jar</code>来启动，或者用条命令。</p><p>至此结束。</p><blockquote><p>参考链接：</p><p><a href="https://www.jianshu.com/p/a4556f12af54" target="_blank" rel="noopener">Kali破解版burpsuite pro配置</a></p><p><a href="https://www.jianshu.com/p/3e7bb41a1464" target="_blank" rel="noopener">Ubuntu中安装burp suite</a></p><p><a href="https://www.52pojie.cn/thread-691448-1-1.html" target="_blank" rel="noopener">Burp Suite Pro Loader&amp;Keygen By surferxyz（更新新版，附带v1.7.37原版）</a></p></blockquote><a id="more"></a><h1 id="无关安装的碎碎念"><a href="#无关安装的碎碎念" class="headerlink" title="无关安装的碎碎念"></a>无关安装的碎碎念</h1><p>行文将至加个私话，把“阅读全文”的设置放在了这节之前。<br>这款软件真的太棒了，有时在做CTF时，可以重放请求。之前也试过爆破校园Wi-Fi登陆密码。但用的都不太好，可能以后也会记录些学习使用Burp的内容，但看起来网上也不缺，加上现在表达不好。就纯当笔记了，底线大概是我以后回来看还能看懂。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;起因&quot;&gt;&lt;a href=&quot;#起因&quot; class=&quot;headerlink&quot; title=&quot;起因&quot;&gt;&lt;/a&gt;起因&lt;/h1&gt;&lt;p&gt;额，为什么想写这个呢？大概是因为去年安装Burp Suite破解版时费了好多事，感觉好麻烦。这个软件也确实好用&lt;del&gt;尽管现在不怎么会用&lt;/del&gt;，所以以前想要记录下如果换电脑了该怎么安装，昨天在Ubuntu的虚拟机里安装了下，发现，好像也还行，之前没记录，这次就记录下吧。&lt;/p&gt;
+&lt;h1 id=&quot;下载安装&quot;&gt;&lt;a href=&quot;#下载安装&quot; class=&quot;headerlink&quot; title=&quot;下载安装&quot;&gt;&lt;/a&gt;下载安装&lt;/h1&gt;&lt;h2 id=&quot;Java环境&quot;&gt;&lt;a href=&quot;#Java环境&quot; class=&quot;headerlink&quot; title=&quot;Java环境&quot;&gt;&lt;/a&gt;Java环境&lt;/h2&gt;&lt;p&gt;&lt;a href=&quot;https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html&quot; title=&quot;下载Java环境&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html&lt;/a&gt;。注意需要登录，选择jar文件。下载时选中 Accept License Agreement。&lt;/p&gt;
+&lt;p&gt;之后敲入如下代码。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;tar -xzvf jdk-8u191-linux-i586.tar.gz
+mv jdk1.8.0_191/ /usr/local/lib/jvm
+cd /usr/local/lib
+mv jvm jdk1.8
+export JAVA_HOME=/usr/local/lib/jdk1.8/ 
+export JRE_HOME=JAVAHOME/jreexportCLASSPATH=.:{JAVA_HOME}/lib:JREHOME/libexportPATH={JAVA_HOME}/bin:$PATH
+update-alternatives --install /usr/bin/java java /usr/local/lib/jdk1.8/bin/java 1 
+update-alternatives --install /usr/bin/javac javac /usr/local/lib/jdk1.8/bin/javac 1
+update-alternatives --set java /usr/local/lib/jdk1.8/bin/java
+update-alternatives --set javac /usr/local/lib/jdk1.8/bin/javac
+java -version &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;看到&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;java -version&lt;/p&gt;
+&lt;p&gt;java version “1.8.0_221”&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Java(TM) SE Runtime Environment (build 1.8.0_221-b11)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Java HotSpot(TM) 64-Bit Server VM (build 25.221-b11, mixed mode)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;就成功了。&lt;/p&gt;
+&lt;h2 id=&quot;Burp-Suite&quot;&gt;&lt;a href=&quot;#Burp-Suite&quot; class=&quot;headerlink&quot; title=&quot;Burp Suite&quot;&gt;&lt;/a&gt;Burp Suite&lt;/h2&gt;&lt;p&gt;然后从官网下载Burp Suite。&lt;a href=&quot;https://portswigger.net/burp&quot; title=&quot;Burp&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;https://portswigger.net/burp&lt;/a&gt;。我是下载的Community版的，一是因为，Pro版本免费试用下载需要申请，我昨天晚上用edu学生邮箱申请了，现在还没看到下载链接。或许是我搞得有问题？二是，看了52pojie的帖子好像使用破解补丁后好像没影响。&lt;em&gt;（见参考链接1评论）&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;之后下载破解补丁。&lt;/p&gt;
+&lt;p&gt;我是之前从52pojie找到的补丁，然后&lt;strong&gt;好像&lt;/strong&gt;找到了 原作者发布的补丁，之后比较了校验和。只记得相对来说应该算是比较可靠的，就用了之前备份的补丁。这里用到的是burp-loader-keygen.jar和burpsuite_pro_v1.7.36.jar.然后把&lt;em&gt;burpsuite_pro_v1.7.36.jar&lt;/em&gt;改名为 &lt;strong&gt;burpsuite_community_v1.7.36.jar&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;拉到虚拟机里和Burp放入同一个目录里。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;java -jar burp-loader-keygen.jar&lt;/code&gt;&lt;/pre&gt;&lt;ol&gt;
+&lt;li&gt;点击&lt;code&gt;Run&lt;/code&gt; &lt;em&gt;（可以先修改&lt;code&gt;License Text&lt;/code&gt;）&lt;/em&gt;&lt;/li&gt;
+&lt;li&gt;复制 &lt;code&gt;License&lt;/code&gt; 粘贴入输入框。然后 &lt;code&gt;Next&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;点击 &lt;code&gt;Manual activation&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;复制第二个文本框的内容或者 &lt;code&gt;Copy Request&lt;/code&gt;，粘贴进 &lt;code&gt;License&lt;/code&gt;下的文本框 &lt;code&gt;Activation Requests&lt;/code&gt;里，在下边的框会自动生成内容。粘贴回注册的第三个文本框或者 &lt;code&gt;Paste response&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;然后，应该就OK了。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;之后启动也可以用 &lt;code&gt;java -jar burp-loader-keygen.jar&lt;/code&gt;来启动，或者用条命令。&lt;/p&gt;
+&lt;p&gt;至此结束。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;参考链接：&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.jianshu.com/p/a4556f12af54&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Kali破解版burpsuite pro配置&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.jianshu.com/p/3e7bb41a1464&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Ubuntu中安装burp suite&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://www.52pojie.cn/thread-691448-1-1.html&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Burp Suite Pro Loader&amp;amp;Keygen By surferxyz（更新新版，附带v1.7.37原版）&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/categories/Sec/"/>
+    
+      <category term="Tools" scheme="http://yoursite.com/categories/Sec/Tools/"/>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/tags/Sec/"/>
+    
+      <category term="Tools" scheme="http://yoursite.com/tags/Tools/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>&lt;Leetcode 28&gt;. Implement strStr()</title>
+    <link href="http://yoursite.com/2019/09/19/Leetcode-28-kmp/"/>
+    <id>http://yoursite.com/2019/09/19/Leetcode-28-kmp/</id>
+    <published>2019-09-19T10:39:15.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="https://leetcode.com/problems/implement-strstr/" title="[28. Implement strStr() 题目链接]" target="_blank" rel="noopener">题目链接</a></p><p>算是比较直接简单的模板题。</p><p>直接简单修改<a href="https://5lyther1n.github.io/2019/09/18/kmp0/#more" title="KMP算法学习笔记" target="_blank" rel="noopener">KMP算法学习笔记</a>后附的代码段落就可以了。</p><pre><code>class Solution {public:    vector&lt;int&gt; getNext(string n) {        int len = n.size();        vector&lt;int&gt; next(len+1,0) ;        int i,j;        next[0] = -1;        i = 0,j = 0;        while(i &lt; len){            if(j == -1 || n[i] == n[j]){                ++ i;                ++ j;                next[i] = j;            }            else j = next[j];        }        return next;    }    int strStr(string h, string n) {        if(n.size() == 0) return 0;        int i,j,lenh,lenn;        lenh = h.size();        lenn = n.size();        i = 0,j = 0;        vector&lt;int&gt; next = getNext(n);        while(i &lt; lenh &amp;&amp; j &lt; lenn){            if(j == -1 || h[i] == n[j]){                ++ i;                ++ j;            }            else j = next[j];        }        if(j == lenn)return i-j;        return -1;   }};Accepted    8 ms    9.4 MB    cpp</code></pre><p><em>bin神的模板代码感觉是不错，可我的代码风格感觉没那么简洁0.0，哎，<del>~ 扶脑壳 ~</del></em></p><p><em>(PS:好像这个主题默认不能使用方括号作为标题啊0.0)</em></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/implement-strstr/&quot; title=&quot;[28. Implement strStr() 题目链接]&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;题目链接&lt;/a&gt;&lt;/
+      
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
+    
+      <category term="KMP" scheme="http://yoursite.com/tags/KMP/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>KMP算法学习笔记</title>
+    <link href="http://yoursite.com/2019/09/18/kmp0/"/>
+    <id>http://yoursite.com/2019/09/18/kmp0/</id>
+    <published>2019-09-18T01:09:24.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="前情摘要"><a href="#前情摘要" class="headerlink" title="前情摘要"></a>前情摘要</h1><p>其实，KMP不是第一次学了，但是总是学了忘忘了学，原因还是以前只是记住了用法和板子，但是对于整个算法的理解很不到位，恰巧这次做康复训练时首先看到了KMP，就决定先认真学下这个吧~ </p><p><strong>友情提醒：</strong></p><p><strong>本人表达能力欠缺。文章看起来可能有点别扭，望见谅，实在难受可右上角。</strong></p><p><strong>尽量以后写好点吧 0.0</strong></p><h1 id="字符串匹配问题"><a href="#字符串匹配问题" class="headerlink" title="字符串匹配问题"></a>字符串匹配问题</h1><p>在一个主串S内查找一个模式串W的出现位置。面对这样的问题，我们该怎么解决呢？顺着最初的解决方法往下逐步引入KMP。</p><h2 id="暴力枚举"><a href="#暴力枚举" class="headerlink" title="暴力枚举"></a>暴力枚举</h2><p>最初的想法是暴力，因为，这是最简单最容易想到的方法。枚举S的每个位置i，同时使j以i为起始点，对比W的每个位置k，判断S[j]是否与W[k]相等，相等则当前i为答案。</p><p>这种解决方法简单暴力，但是时间复杂度可以达到O(len(S) * len(W))当两个字符串长度乘积较大时会耗时特别长。那么现在考虑优化。</p><h2 id="优化一"><a href="#优化一" class="headerlink" title="优化一"></a>优化一</h2><p>对于这个问题，我最开始想到的优化方法是，如果能够匹配成功，则主串开始位置字符与模式串首位字符一定相等(即s[i] == w[0])，所以，首先先对主串枚举寻找等于W[0]的位置，将其放入一个list中。然后以list的元素为起始点，开始进行匹配工作。</p><p>时间复杂度大概为O( num[ w[0] ] * len(W) )，看起来<strong><em>像</em></strong>是优化的不错，但是很容易发现，这种优化很容易因为S中w[0]数量过多而退化，形如S=”aafaabc”,W=”abc”时，并没有优化多少。</p><a id="more"></a><h2 id="优化二"><a href="#优化二" class="headerlink" title="优化二"></a>优化二</h2><p>还有一种优化方式是在网上看到的，即当前匹配失败时，跳过匹配成功的地方，直接在失败开始匹配。额，这种优化我没想到过，因为，很容易找到反例进行Challenge.</p><p><em>(PS:我想到的这种优化的反例是，S=”abcabcabd” W=”abcabd”)</em></p><p><em>(todo:好像能总结出方法，但是，叙述不好，之后再做0.0)</em></p><h1 id="KMP"><a href="#KMP" class="headerlink" title="KMP"></a>KMP</h1><p>在1.3种提到的优化，那个跳跃式的方法很有趣，只是跳跃的太多了，容易把正确解跳过。而1.2所示的优化方法可以看做跳跃太少，那么怎么才能跳跃到刚刚好的位置？同时，尽可能利用已经匹配过的结果，将乘法复杂度优化成加法复杂度。</p><p>这时看到了KMP算法。</p><p>对于S=”abcabcabd”,W=”abcabd”来说。</p><blockquote><p>0 1 2 3 4 5 6 7 8</p><p>a b c a b c a b d</p><p>a b c a b d</p></blockquote><p>匹配到i=5时，一个是c一个是d。可以发现，当前已经匹配完成的S’=”abcab”与W’=”abcab”是相等的，只要找到前缀后缀最长匹配表，就是下一次开始查找的位置。这里最长的前后缀匹配表是”ab”，那么现在第一个”ab”不对，只要跳跃到第二个”ab”上就可以了。</p><h1 id="部分匹配表"><a href="#部分匹配表" class="headerlink" title="部分匹配表"></a>部分匹配表</h1><p>因为最终需要查找的是主串中的模式串，可以提前预处理出模式串的最长前后缀表。</p><p>怎么处理好呢？</p><p>举例来说，W = “ a b a b a b z a b a b a b a”</p><table><thead><tr><th align="center">w[i]</th><th align="center">a</th><th align="center">b</th><th align="center">a</th><th align="center">b</th><th align="center">a</th><th align="center">b</th><th align="center">z</th><th align="center">a</th><th align="center">b</th><th align="center">a</th><th align="center">b</th><th align="center">a</th><th align="center">b</th><th align="center">a</th></tr></thead><tbody><tr><td align="center">i</td><td align="center">0</td><td align="center">1</td><td align="center">2</td><td align="center">3</td><td align="center">4</td><td align="center">5</td><td align="center">6</td><td align="center">7</td><td align="center">8</td><td align="center">9</td><td align="center">10</td><td align="center">11</td><td align="center">12</td><td align="center">13</td></tr><tr><td align="center">x[i]</td><td align="center">0</td><td align="center">0</td><td align="center">1</td><td align="center">2</td><td align="center">3</td><td align="center">4</td><td align="center">0</td><td align="center">1</td><td align="center">2</td><td align="center">3</td><td align="center">4</td><td align="center">5</td><td align="center">6</td><td align="center">5</td></tr></tbody></table><ol><li>首先初始化，i = j = 0; </li><li>i=1时,x[i]依然为0</li><li>i=2时，对比出w[i] == w[j] == ‘a’,所以x[i] = 1,同时j到下一位，j=1；</li><li>i=3时，对比出w[i] == w[j] == ‘b’,这时，最长匹配串为”ab”，所以x[i] = 2,j=2.</li><li>i=4时，对比出w[i] == w[j] == ‘a’,这时，最长匹配串为”aba”，所以x[i] = 3,j=3.</li></ol><p>到这里不难发现，也很好理解，当w[i] == w[j]时 x[i] == x[i-1] + 1；后面的结果也能证实公式的正确性。</p><p>直到当i=6，j=4.先直接目测，就可以看出来此时x[i] = 0；一直到i=13，j=6.w[i]=’a’但是，w[j]=’z’.两者不相等。</p><p>这里可以看作：</p><p>将Q=”ababab”,则W=Q+z+Q+’a’。</p><p>怎么寻找新的最长前后缀串呢?<br>首先新的前后缀串Q’长度必然不会大于Q的长度<em>(如果Q=”aaaaaa”，即Q中每个字符相等且等于新加入的字符时，len(Q’) == len(Q) )</em></p><p>我们可以把这个新问题当成一个子问题，此时W=Q*+ t + H + Q* + ‘a’.这里的H是一个长度大于等于<br>z的一个字符串，t是衔接Q*与H的一个字符。</p><p>如果t == ‘a’,则可以确定新的最大前后缀串是Q*+t或者也可以说是Q*+’a’</p><p>如果t != ‘a’怎么办呢？继续往下划分啊。。。不断缩小Q*的长度。</p><p>那么问题又来了，怎么找到第一个Q*，即长度最长的Q*。</p><p>这里可以用次长前后缀串，也就是长度仅次于最长前后缀串的串0.0</p><p>那么次长前后缀串怎么找呢？可以看如图所示。（ <del>忽略灵魂画手</del> ）<br><img src="https://i.loli.net/2019/09/18/768hTNZSy4vfCcX.jpg" alt="次长前后缀串示意图"></p><p>黑色是最长前后缀串，蓝色是次长前后缀串，因为同色是对应相等的，所以可以把后边的蓝色移动到前边，可以发现，次长前后缀串就是最长前后缀串的最长前后缀串0.0（ <del>我这表达能力我也是服了</del> ）</p><p>所以，回到表中。w[13] == w[ x[x[12]-1]]，所以x[13] = x[5] + 1 = 5。<br>用这种方法可以回过来证明x[6] = 0.</p><h1 id="算法实现"><a href="#算法实现" class="headerlink" title="算法实现"></a>算法实现</h1><p>首先看上边的公式也能发现，对于位置i，我们只考虑i-1的前后缀串情况。我们可以用一个数组表示x[i]右移一位的结果，这样更方便。这个也就是平时所说的next数组。</p><pre><code>void getNext(char * w, long * next){    next[0] = -1;    long i = 0, j = -1;    while (i &lt; strlen(w))    {        if (j == -1 || w[i] == w[j])        {            ++i;            ++j;            next[i] = j;        }            else            j = next[j];    }}</code></pre><p>之后是使用next的KMP算法</p><pre><code>int KMP(char * t, char * p) {    int i = 0;     int j = 0;    while (i &lt; strlen(t) &amp;&amp; j &lt; strlen(p))    {        if (j == -1 || t[i] == p[j])         {            i++;               j++;        }         else                    j = next[j];    }    if (j == strlen(p))       return i - j;    else        return -1;}</code></pre><blockquote><p>参考链接：</p><p><a href="https://www.zhihu.com/question/21923021/answer/37475572" target="_blank" rel="noopener">https://www.zhihu.com/question/21923021/answer/37475572</a><br><a href="https://www.zhihu.com/question/21923021/answer/281346746" target="_blank" rel="noopener">https://www.zhihu.com/question/21923021/answer/281346746</a><br><a href="http://aaaron7.github.io/blog/algorithm/kmp-explain" target="_blank" rel="noopener">http://aaaron7.github.io/blog/algorithm/kmp-explain</a></p></blockquote><h1 id="写在最后"><a href="#写在最后" class="headerlink" title="写在最后"></a>写在最后</h1><p>哇，写博客可太难了。尤其是我这表达能力，写的可太费劲了。如果看了这篇blog求不打我。</p><p>也觉得，通过把想的转化成写的，会把思路理清 <del>~ (尽管不一定能写清0.0 ) ~</del></p><p>中间有些不清楚的细节也可以想清楚。</p><p>只是这个表达和文章格式真的有点一言难尽，我觉得把我想写的不想写的都写了出来，有点抓不住重点，可能太想都兼顾反而什么都没有说清。</p><p>以后慢慢来吧，看别人文章时多留意，慢慢写慢慢改吧~ </p><p>有机会，可能的话，把这篇文章再重构下吧。。。</p><p>加油<del>~</del></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;前情摘要&quot;&gt;&lt;a href=&quot;#前情摘要&quot; class=&quot;headerlink&quot; title=&quot;前情摘要&quot;&gt;&lt;/a&gt;前情摘要&lt;/h1&gt;&lt;p&gt;其实，KMP不是第一次学了，但是总是学了忘忘了学，原因还是以前只是记住了用法和板子，但是对于整个算法的理解很不到位，恰巧这次做康复训练时首先看到了KMP，就决定先认真学下这个吧~ &lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;友情提醒：&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;本人表达能力欠缺。文章看起来可能有点别扭，望见谅，实在难受可右上角。&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;尽量以后写好点吧 0.0&lt;/strong&gt;&lt;/p&gt;
+&lt;h1 id=&quot;字符串匹配问题&quot;&gt;&lt;a href=&quot;#字符串匹配问题&quot; class=&quot;headerlink&quot; title=&quot;字符串匹配问题&quot;&gt;&lt;/a&gt;字符串匹配问题&lt;/h1&gt;&lt;p&gt;在一个主串S内查找一个模式串W的出现位置。面对这样的问题，我们该怎么解决呢？顺着最初的解决方法往下逐步引入KMP。&lt;/p&gt;
+&lt;h2 id=&quot;暴力枚举&quot;&gt;&lt;a href=&quot;#暴力枚举&quot; class=&quot;headerlink&quot; title=&quot;暴力枚举&quot;&gt;&lt;/a&gt;暴力枚举&lt;/h2&gt;&lt;p&gt;最初的想法是暴力，因为，这是最简单最容易想到的方法。枚举S的每个位置i，同时使j以i为起始点，对比W的每个位置k，判断S[j]是否与W[k]相等，相等则当前i为答案。&lt;/p&gt;
+&lt;p&gt;这种解决方法简单暴力，但是时间复杂度可以达到O(len(S) * len(W))当两个字符串长度乘积较大时会耗时特别长。那么现在考虑优化。&lt;/p&gt;
+&lt;h2 id=&quot;优化一&quot;&gt;&lt;a href=&quot;#优化一&quot; class=&quot;headerlink&quot; title=&quot;优化一&quot;&gt;&lt;/a&gt;优化一&lt;/h2&gt;&lt;p&gt;对于这个问题，我最开始想到的优化方法是，如果能够匹配成功，则主串开始位置字符与模式串首位字符一定相等(即s[i] == w[0])，所以，首先先对主串枚举寻找等于W[0]的位置，将其放入一个list中。然后以list的元素为起始点，开始进行匹配工作。&lt;/p&gt;
+&lt;p&gt;时间复杂度大概为O( num[ w[0] ] * len(W) )，看起来&lt;strong&gt;&lt;em&gt;像&lt;/em&gt;&lt;/strong&gt;是优化的不错，但是很容易发现，这种优化很容易因为S中w[0]数量过多而退化，形如S=”aafaabc”,W=”abc”时，并没有优化多少。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>今天开始，重新学算法啦！</title>
+    <link href="http://yoursite.com/2019/09/16/algorith-contest-0/"/>
+    <id>http://yoursite.com/2019/09/16/algorith-contest-0/</id>
+    <published>2019-09-16T07:31:01.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="0-背景"><a href="#0-背景" class="headerlink" title="0. 背景"></a>0. 背景</h1><p>准备认真学习些算法知识，一方面是算法确实很重要也很有趣。另一方面也是为之后找工作可能用到做些准备。</p><p>这算是一个<strong>导航页</strong>，之后会有：</p><ul><li>参加的Codeforces、GCJ、Hiho等<strong>算法竞赛</strong>的记录。</li><li>学习算法时记录、总结的一些小<strong>专题</strong>以方便复习。</li><li>可能有用到些算法的玩具或者小项目。</li></ul><p>希望能写下去吧，菜到写不动也是很可能发生的啊0.0</p><p>加油~</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;0-背景&quot;&gt;&lt;a href=&quot;#0-背景&quot; class=&quot;headerlink&quot; title=&quot;0. 背景&quot;&gt;&lt;/a&gt;0. 背景&lt;/h1&gt;&lt;p&gt;准备认真学习些算法知识，一方面是算法确实很重要也很有趣。另一方面也是为之后找工作可能用到做些准备。&lt;/p&gt;
+&lt;p&gt;这算是
+      
+    
+    </summary>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
+    
+    
+      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Hello World</title>
+    <link href="http://yoursite.com/2019/09/15/Hello-World-0/"/>
+    <id>http://yoursite.com/2019/09/15/Hello-World-0/</id>
+    <published>2019-09-15T10:57:29.000Z</published>
+    <updated>2019-11-17T13:47:37.539Z</updated>
+    
+    <content type="html"><![CDATA[<p>  经过这两天各种的折腾，这个Blog终于算是可以用了。</p><p>  期待以后可以在这里记录些学习到的东西，作为一个在网络上记录、分享、备份的笔记。</p><p>不负时光，好好加油吧~</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;  经过这两天各种的折腾，这个Blog终于算是可以用了。&lt;/p&gt;
+&lt;p&gt;  期待以后可以在这里记录些学习到的东西，作为一个在网络上记录、分享、备份的笔记。&lt;/p&gt;
+&lt;p&gt;不负时光，好好加油吧~&lt;/p&gt;
+
+      
+    
+    </summary>
+    
+    
+      <category term="乱七八糟" scheme="http://yoursite.com/categories/%E4%B9%B1%E4%B8%83%E5%85%AB%E7%B3%9F/"/>
+    
+    
+      <category term="杂事" scheme="http://yoursite.com/tags/%E6%9D%82%E4%BA%8B/"/>
+    
+  </entry>
+  
+</feed>
