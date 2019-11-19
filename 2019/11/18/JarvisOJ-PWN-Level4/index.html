@@ -56,19 +56,19 @@
   };
 </script>
 
-  <meta name="description" content="题目描述  Ugly Number  题目大意：判断一个数是否只能被2，3，5整除，即不存在其他因数。">
-<meta name="keywords" content="algorithms,Leetcode,算法杂项实现">
+  <meta name="description" content="独立解题 check了一下，32位,NX保护开启了。 IDA 看了下，和level3差不多。 但是，没有给指定的库。上一题的操作方法就不能使用了 自然而然的不知道该怎么做了0.0题解  前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
+<meta name="keywords" content="Sec,CTF,PWN,JarvisOJ">
 <meta property="og:type" content="article">
-<meta property="og:title" content="&lt; Leetcode 263 &gt;. Ugly Number">
-<meta property="og:url" content="http://yoursite.com/2019/09/24/Leetcode-263-EZ/index.html">
+<meta property="og:title" content="JarvisOJ_PWN_Level4">
+<meta property="og:url" content="http://yoursite.com/2019/11/18/JarvisOJ-PWN-Level4/index.html">
 <meta property="og:site_name" content="5lyTher1n&#39;s Blog">
-<meta property="og:description" content="题目描述  Ugly Number  题目大意：判断一个数是否只能被2，3，5整除，即不存在其他因数。">
+<meta property="og:description" content="独立解题 check了一下，32位,NX保护开启了。 IDA 看了下，和level3差不多。 但是，没有给指定的库。上一题的操作方法就不能使用了 自然而然的不知道该怎么做了0.0题解  前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-17T13:47:37.539Z">
+<meta property="og:updated_time" content="2019-11-18T15:00:17.220Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="&lt; Leetcode 263 &gt;. Ugly Number">
-<meta name="twitter:description" content="题目描述  Ugly Number  题目大意：判断一个数是否只能被2，3，5整除，即不存在其他因数。">
-  <link rel="canonical" href="http://yoursite.com/2019/09/24/Leetcode-263-EZ/">
+<meta name="twitter:title" content="JarvisOJ_PWN_Level4">
+<meta name="twitter:description" content="独立解题 check了一下，32位,NX保护开启了。 IDA 看了下，和level3差不多。 但是，没有给指定的库。上一题的操作方法就不能使用了 自然而然的不知道该怎么做了0.0题解  前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
+  <link rel="canonical" href="http://yoursite.com/2019/11/18/JarvisOJ-PWN-Level4/">
 
 
 <script id="page-configurations">
@@ -82,7 +82,7 @@
   };
 </script>
 
-  <title>< Leetcode 263 >. Ugly Number | 5lyTher1n's Blog</title>
+  <title>JarvisOJ_PWN_Level4 | 5lyTher1n's Blog</title>
   
 
 
@@ -257,7 +257,7 @@
   
   
   <div class="post-block post">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/24/Leetcode-263-EZ/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/18/JarvisOJ-PWN-Level4/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="5lyTher1n">
@@ -269,7 +269,7 @@
       <meta itemprop="name" content="5lyTher1n's Blog">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">< Leetcode 263 >. Ugly Number
+        <h1 class="post-title" itemprop="name headline">JarvisOJ_PWN_Level4
 
           
         </h1>
@@ -285,19 +285,11 @@
                 
               
 
-              <time title="创建时间：2019-09-24 10:30:11" itemprop="dateCreated datePublished" datetime="2019-09-24T10:30:11+08:00">2019-09-24</time>
+              <time title="创建时间：2019-11-18 20:23:51 / 修改时间：23:00:17" itemprop="dateCreated datePublished" datetime="2019-11-18T20:23:51+08:00">2019-11-18</time>
             </span>
           
             
 
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-17 21:47:37" itemprop="dateModified" datetime="2019-11-17T21:47:37+08:00">2019-11-17</time>
-              </span>
             
           
             <span class="post-meta-item">
@@ -306,21 +298,21 @@
               </span>
               <span class="post-meta-item-text">分类于</span>
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/algorithms/" itemprop="url" rel="index"><span itemprop="name">algorithms</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/" itemprop="url" rel="index"><span itemprop="name">Sec</span></a></span>
 
                 
                 
                   ，
                 
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/algorithms/算法习题/" itemprop="url" rel="index"><span itemprop="name">算法习题</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a></span>
 
                 
                 
                   ，
                 
               
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/algorithms/算法习题/Leetcode/" itemprop="url" rel="index"><span itemprop="name">Leetcode</span></a></span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/CTF/PWN/" itemprop="url" rel="index"><span itemprop="name">PWN</span></a></span>
 
                 
                 
@@ -339,32 +331,41 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <h1 id="题目描述"><a href="#题目描述" class="headerlink" title="题目描述"></a>题目描述</h1><blockquote>
-<p> <a href="https://leetcode.com/problems/ugly-number/" target="_blank" rel="noopener">Ugly Number</a></p>
-</blockquote>
-<p>题目大意：<br>判断一个数是否只能被2，3，5整除，即不存在其他因数。</p>
+        <h1 id="独立解题"><a href="#独立解题" class="headerlink" title="独立解题"></a>独立解题</h1><ul>
+<li>check了一下，32位,NX保护开启了。</li>
+<li>IDA 看了下，和level3差不多。</li>
+<li>但是，没有给指定的库。上一题的操作方法就不能使用了</li>
+<li><del>自然而然的</del>不知道该怎么做了0.0<h1 id="题解"><a href="#题解" class="headerlink" title="题解"></a>题解</h1></li>
+</ul>
+<p><strong>前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备</strong></p>
 <a id="more"></a>
-<h1 id="原始解法"><a href="#原始解法" class="headerlink" title="原始解法"></a>原始解法</h1><p>直接实现。</p>
-<pre><code>    class Solution {
-    public:
-    bool isUgly(int num) {
-         if( !num )return false;
-         while( !(num % 2))num /= 2;
-         while( !(num % 3))num /= 3;
-         while( !(num % 5))num /= 5;
-        if(num == 1)return true;
-        return false;
-    }
-};</code></pre><h1 id="修改解法"><a href="#修改解法" class="headerlink" title="修改解法"></a>修改解法</h1><p>看了Discuss的一种解法，觉得看着挺简洁舒服的。。。</p>
-<pre><code>class Solution {
-    public:
-        bool isUgly(int num) {
-             for(int i = 2; i &lt;= 5 &amp;&amp; num ; ++ i)
-                    while(num % i == 0)num /= i;
-            return num == 1;
-        }
-};</code></pre><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>简单题也尽量写的简洁舒适，要可以在Notepad写完交上去也能对的程度。</p>
-<p>加油~</p>
+<h2 id="DynELF"><a href="#DynELF" class="headerlink" title="DynELF"></a>DynELF</h2><p>知道了一个工具叫做DynELF：</p>
+<p>作用：处理远程目标时，在未指定库文件的情况下，通过泄露一些libc文件信息，进行枚举对比猜解出所使用的库文件版本之类的信息。</p>
+<p>前提：存在可以泄露信息的漏洞。该漏洞可以被反复触发，不会因为一次触发导致崩溃。  </p>
+<p>利用：最好是有write函数存在，来输出信息。相比print、puts等函数不会被’\n’,’\0’干扰。</p>
+<p>使用DynELF函数需要先构造一个leak函数，可以泄露地址信息。最后会获得一个实例，可以用lookup方法得到远程目标里想要的函数地址。</p>
+<h2 id="第一个payload"><a href="#第一个payload" class="headerlink" title="第一个payload"></a>第一个payload</h2><p>在leak函数里，构造第一个payload = pad + p32(write_addr) + p32(vuln_addr) + p32(1) + p32(addr) + p32(8).</p>
+<p>然后调用函数d = DynELF(leak,elf = elf)。获取得到使用的库文件信息。使用d.lookup(‘system’, ‘libc’)获取system地址。</p>
+<h2 id="第二个payload"><a href="#第二个payload" class="headerlink" title="第二个payload"></a>第二个payload</h2><p>没有’/bin/sh’。好像lookup没法找到数据的地址。</p>
+<p>这里可以利用read函数，把这个字符串读入到bss段去。是稳定不受干扰的。</p>
+<p>构造第二个payload = pad + p32(read_addr) + p32(vuln_addr) + p32(0) + p32(bss_addr) + p32(8).<br>conn.send(payload)<br>conn.sendline(‘/bin/sh’)#这里因为sendline会多加一个’\n’所以正好可以配齐8个字节。</p>
+<h2 id="第三个payload"><a href="#第三个payload" class="headerlink" title="第三个payload"></a>第三个payload</h2><p>最后的利用了.<br>payload = pad + p32(system_addr) + p32(0xdeaddead) + p32(bss_addr)</p>
+<p>看到有些题解，可以只要两个payload就可以了。</p>
+<p>把第二个和第三个综合起来。因为read函数是三个参数，可以找是否有段代码是连续3个pop加上一个rtn。找到这个地址替换vuln_addr。之后去掉pad拼接上第三个payload.</p>
+<p>详见<a href="http://www.mamicode.com/info-detail-1971189.html#7%E3%80%81%5BXMAN%5Dlevel4%EF%BC%88DynELF%E6%B3%84%E9%9C%B2system%E5%9C%B0%E5%9D%80%EF%BC%89" target="_blank" rel="noopener">Write Up</a></p>
+<p>大致是这样的<br>payload = pad + p32(read_addr)</p>
+<p>payload+= p32(p3t) + p32(0) + p32(bss_addr) + p32(8)</p>
+<p>payload+= p32(system_addr) + p32(0xdeaddead）+ p32(bss_addr)</p>
+<p>太有趣了<del>~</del></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>首先，DynELF我在Ubuntu16.04下用python 3.5.2一直运行不成功，提示</p>
+<blockquote>
+<p>string argument without an encoding</p>
+</blockquote>
+<p>但是<br>    d = DynELF(leak, elf = elf)<br>两个参数一个是函数，一个elf类型。与str和bytes没什么关系啊，跟进到pwntools的python文件里看了看，嗯。。。学艺不精不知道该怎么改。</p>
+<p>感觉上不像是我的问题。。。</p>
+<p>最后无奈换了python2.7的环境，一下就成功了0.0</p>
+<p>然后，记录的时候发现很多东西不敢写，因为，很多东西我不懂。我可能能跟着WP复现出来，也知道整个步骤是什么意思，为什么这样做，之后遇到类似的问题能解决，但是对本身的基础的知识我就不太懂了，甚至包括很多常识性的知识点也是不太明白的。</p>
+<p>现在就先刷刷题，然后有个基本的印象，再根据情况哪儿需要恶补才回去补吧。估计，大概率，这份Blog很长时间只能作为记录使用，对别人应该没什么帮助，质量偏差。┑(￣Д ￣)┍</p>
 <p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>
 
     </div>
@@ -381,11 +382,13 @@
           
           <div class="post-tags">
             
-              <a href="/tags/algorithms/" rel="tag"># algorithms</a>
+              <a href="/tags/Sec/" rel="tag"># Sec</a>
             
-              <a href="/tags/Leetcode/" rel="tag"># Leetcode</a>
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
             
-              <a href="/tags/算法杂项实现/" rel="tag"># 算法杂项实现</a>
+              <a href="/tags/PWN/" rel="tag"># PWN</a>
+            
+              <a href="/tags/JarvisOJ/" rel="tag"># JarvisOJ</a>
             
           </div>
         
@@ -395,8 +398,8 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2019/09/23/Leetcode-238-Interesting/" rel="next" title="< Leetcode 238 >. Product of Array Except Self">
-                  <i class="fa fa-chevron-left"></i> < Leetcode 238 >. Product of Array Except Self
+                <a href="/2019/11/17/JarvisOJ-PWN-level0-to-level3/" rel="next" title="JarvisOJ_PWN_from_level0_to_level3">
+                  <i class="fa fa-chevron-left"></i> JarvisOJ_PWN_from_level0_to_level3
                 </a>
               
             </div>
@@ -405,8 +408,8 @@
 
             <div class="post-nav-prev post-nav-item">
               
-                <a href="/2019/09/24/LeetCode-313-DP/" rel="prev" title="< LeetCode 313 >. Super Ugly Number">
-                  < LeetCode 313 >. Super Ugly Number <i class="fa fa-chevron-right"></i>
+                <a href="/2019/11/19/JarvisOJ-PWN-level2-64/" rel="prev" title="JarvisOJ_PWN_level2_64">
+                  JarvisOJ_PWN_level2_64 <i class="fa fa-chevron-right"></i>
                 </a>
               
             </div>
@@ -456,7 +459,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#题目描述"><span class="nav-number">1.</span> <span class="nav-text">题目描述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#原始解法"><span class="nav-number">2.</span> <span class="nav-text">原始解法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#修改解法"><span class="nav-number">3.</span> <span class="nav-text">修改解法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#独立解题"><span class="nav-number">1.</span> <span class="nav-text">独立解题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#DynELF"><span class="nav-number">2.1.</span> <span class="nav-text">DynELF</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第一个payload"><span class="nav-number">2.2.</span> <span class="nav-text">第一个payload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二个payload"><span class="nav-number">2.3.</span> <span class="nav-text">第二个payload</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第三个payload"><span class="nav-number">2.4.</span> <span class="nav-text">第三个payload</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->

@@ -56,14 +56,19 @@
   };
 </script>
 
-  <meta property="og:type" content="website">
-<meta property="og:title" content="5lyTher1n&#39;s Blog">
-<meta property="og:url" content="http://yoursite.com/tags/杂事/index.html">
+  <meta name="description" content="花絮上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。 独立解题和之前做的Level2差不多。但是这题是64位的。 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
+<meta name="keywords" content="Sec,CTF,PWN,JarvisOJ">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JarvisOJ_PWN_level2_64">
+<meta property="og:url" content="http://yoursite.com/2019/11/19/JarvisOJ-PWN-level2-64/index.html">
 <meta property="og:site_name" content="5lyTher1n&#39;s Blog">
+<meta property="og:description" content="花絮上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。 独立解题和之前做的Level2差不多。但是这题是64位的。 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-11-19T14:41:08.505Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="5lyTher1n&#39;s Blog">
-  <link rel="canonical" href="http://yoursite.com/tags/杂事/">
+<meta name="twitter:title" content="JarvisOJ_PWN_level2_64">
+<meta name="twitter:description" content="花絮上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。 独立解题和之前做的Level2差不多。但是这题是64位的。 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
+  <link rel="canonical" href="http://yoursite.com/2019/11/19/JarvisOJ-PWN-level2-64/">
 
 
 <script id="page-configurations">
@@ -71,13 +76,13 @@
   CONFIG.page = {
     sidebar: "",
     isHome: false,
-    isPost: false,
+    isPost: true,
     isPage: false,
     isArchive: false
   };
 </script>
 
-  <title>标签: 杂事 | 5lyTher1n's Blog</title>
+  <title>JarvisOJ_PWN_level2_64 | 5lyTher1n's Blog</title>
   
 
 
@@ -243,84 +248,202 @@
         <div class="content-wrap">
             
 
-    
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-      
-      
-    
-    
-
-  
-
           <div id="content" class="content">
             
 
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
   
   
   
-  <div class="post-block tag">
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h1 class="collection-header">杂事<small>标签</small>
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/19/JarvisOJ-PWN-level2-64/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="5lyTher1n">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/header.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="5lyTher1n's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">JarvisOJ_PWN_level2_64
+
+          
         </h1>
-      </div>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-11-19 21:58:11 / 修改时间：22:41:08" itemprop="dateCreated datePublished" datetime="2019-11-19T21:58:11+08:00">2019-11-19</time>
+            </span>
+          
+            
+
+            
+          
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/" itemprop="url" rel="index"><span itemprop="name">Sec</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/CTF/" itemprop="url" rel="index"><span itemprop="name">CTF</span></a></span>
+
+                
+                
+                  ，
+                
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Sec/CTF/PWN/" itemprop="url" rel="index"><span itemprop="name">PWN</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
 
       
+        <h1 id="花絮"><a href="#花絮" class="headerlink" title="花絮"></a>花絮</h1><p>上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。</p>
+<h1 id="独立解题"><a href="#独立解题" class="headerlink" title="独立解题"></a>独立解题</h1><p>和之前做的Level2差不多。但是这题是64位的。</p>
+<p><strong>前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备</strong></p>
+<a id="more"></a>
 
-  
-  
+<p>记得64位和32位主要是传参不一样。</p>
+<ul>
+<li>32位传参只要考虑压栈就可以了。</li>
+<li>64位则要考虑到用寄存器。</li>
+</ul>
+<p>使用IDA查看汇编代码：<br>看到:</p>
+<blockquote>
+<p>mov edx,200h</p>
+<p>mov rsi,rax</p>
+<p>mov edi,0</p>
+<p>call _read</p>
+</blockquote>
+<p>猜测，前三个参数应该是分别使用edi、rsi、edx.</p>
+<p>IDA可以找到system函数的地址和’/bin/sh’字符串的地址。那么只要考虑如何把字符串作为参数提供给edi寄存器，然后return到system函数的地址就可以了。</p>
+<p>第一步：最开始期望的是构造出类似这样的语句：</p>
+<blockquote>
+<p>mov edi ‘/bin/sh’</p>
+</blockquote>
+<p>后来想起来，字符串好像不能这样。操控的大多数是代表的地址。这样是行不通的。</p>
+<p>第二步：在0x400555看到代码：</p>
+<blockquote>
+<p>mov edi offset _bss_start</p>
+</blockquote>
+<p>想起来上一题，把’/bin/sh’写入到bss段的方法，但再想想，写入到bss段之前用到了read函数，而read函数需要3个参数，好像工作量并没有减少啊0.0这是换了一个新的问题。</p>
+<p>第三步：想起来level4的两种payload的方法。也就是寻找pop和rnt，找到一个</p>
+<blockquote>
+<p>pop edi </p>
+<p>rnt</p>
+</blockquote>
+<p>这样的代码就可以了。。。然后开始翻IDA<del>（我不知道怎么搜索）</del>没找到0.0</p>
+<p>在0x4006B2处找到一个类似的：</p>
+<blockquote>
+<p>pop r15</p>
+</blockquote>
+<p>但好像又不太对。<br>至此，卡壳。。。去翻了题解。</p>
+<h1 id="解题报告"><a href="#解题报告" class="headerlink" title="解题报告"></a>解题报告</h1><p>学到了还有ROPgadget这个工具。。。</p>
+<p>直接可以用ROPgadget来查找相关字符串</p>
+<blockquote>
+<p>ROPgadget –binary ./level2_64 –string “/bin/sh”<br>这个可以看到’/bin/sh’的地址<br>ROPgadget –binary ./level2_64 –only “pop|ret” 这个可以看到包含pop+ret的字符串和地址</p>
+</blockquote>
+<p>然后发现在0x4006B3的地址上找到了要想要的代码。</p>
+<p><em>咦这个地址看起来有点熟悉啊，和上面那个差了一点啊0.0而且，IDA找不到哎=。=</em></p>
+<p>确定这个后，就很方便构造payload了<br>大致是：</p>
+<blockquote>
+<p>payload = pad + p64(tools_addr) + p64(sh_addr) + p(system_addr)</p>
+</blockquote>
+<p>然后可以cat flag了~</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
+<li>64位参数传递约定：前六参数按顺序存储在寄存器里，依次是rdi、rsi、rdx、rcx、r8、r9。第七个及以后会压入栈中。（顺序呢？和32位一样从右往左吗？）</li>
+<li>ROPgadget好厉害，才学到一个词是ROP，面向return编程。之前好像看到过，但没在意，现在感觉很有趣，依然，这个工具不太熟悉，需要熟悉下~</li>
+<li>这个payload是我自己写的，也确实能get到flag。但是，总感觉迷迷糊糊的。说实话，我并不太清楚这个payload传输进去后的执行步骤，当时是想适配一个pop，那把sh_addr压入栈。一个ret，那把system函数地址给过去。但具体怎么样要搞清楚！</li>
+</ol>
+<p>下午没做题有点亏，但办的。。。也算正事。。。吧。。。つ﹏⊂</p>
+<p>这些问题等着明天搞吧，明天要搞清楚~</p>
+<p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>
 
-  
+    </div>
+
     
-    <div class="collection-year">
-      <h1 class="collection-header">2019</h1>
-    </div>
-  
-
-  <article itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
-
-      <h2 class="post-title">
+    
+    
         
-          <a class="post-title-link" href="/2019/09/15/Hello-World-0/" itemprop="url">
-            <span itemprop="name">Hello World</span>
-          </a>
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/Sec/" rel="tag"># Sec</a>
+            
+              <a href="/tags/CTF/" rel="tag"># CTF</a>
+            
+              <a href="/tags/PWN/" rel="tag"># PWN</a>
+            
+              <a href="/tags/JarvisOJ/" rel="tag"># JarvisOJ</a>
+            
+          </div>
         
-      </h2>
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated"
-              datetime="2019-09-15T18:57:29+08:00"
-              content="2019-09-15">
-          09-15
-        </time>
-      </div>
+        
 
-    </header>
-  </article>
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/18/JarvisOJ-PWN-Level4/" rel="next" title="JarvisOJ_PWN_Level4">
+                  <i class="fa fa-chevron-left"></i> JarvisOJ_PWN_Level4
+                </a>
+              
+            </div>
 
+            <span class="post-nav-divider"></span>
 
-
-    </div>
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
   </div>
   
   
   
+  </article>
 
-  
-
+  </div>
 
 
           </div>
@@ -339,6 +462,11 @@
 
   <aside class="sidebar">
     <div class="sidebar-inner">
+        
+        
+        
+        
+      
 
       <ul class="sidebar-nav motion-element">
         <li class="sidebar-nav-toc">
@@ -351,6 +479,8 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#花絮"><span class="nav-number">1.</span> <span class="nav-text">花絮</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#独立解题"><span class="nav-number">2.</span> <span class="nav-text">独立解题</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#解题报告"><span class="nav-number">3.</span> <span class="nav-text">解题报告</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">4.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
       </div>
       <!--/noindex-->
 
