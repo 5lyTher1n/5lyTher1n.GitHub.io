@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-11-19T14:41:08.505Z</updated>
+  <updated>2019-11-20T12:25:08.948Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -17,13 +17,48 @@
   <generator uri="http://hexo.io/">Hexo</generator>
   
   <entry>
+    <title>JarvisOJ_PWN_Level3_x64</title>
+    <link href="http://yoursite.com/2019/11/20/JarvisOJ-PWN-Level3-x64/"/>
+    <id>http://yoursite.com/2019/11/20/JarvisOJ-PWN-Level3-x64/</id>
+    <published>2019-11-20T11:43:28.000Z</published>
+    <updated>2019-11-20T12:25:08.948Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="花絮"><a href="#花絮" class="headerlink" title="花絮"></a>花絮</h1><p>第一次在没看题解的情况下，独立解题成功？</p><p>(⊙﹏⊙)连蒙带猜成功了。。。也算成功了。。。吧？。。。</p><p><strong>前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备</strong></p><a id="more"></a><h1 id="独立解题"><a href="#独立解题" class="headerlink" title="独立解题"></a>独立解题</h1><p>先明确下要做什么：</p><p>首先，需要system 和 ‘/bin/sh’</p><p>在64位里，先要让edi寄存器里是’/bin/sh’,然后找到system函数的地址</p><p>查看了下代码这题和level3比较像，是给了第三方的库文件。本身是找不到system和sh的字符串。那么用类似level3的方法找到system和sh地址。</p><h2 id="获取write-GOT"><a href="#获取write-GOT" class="headerlink" title="获取write_GOT"></a>获取write_GOT</h2><p>和level3一样的方式，先把运行时内存中write的地址泄露出来。嗯~ o(<em>￣▽￣</em>)o用write写write。</p><p>不一样的地方在于32位可以直接压栈，但是64位要利用寄存器。自然的想到好朋友，ROPGadget。</p><blockquote><p>ROPgadget –binary ./level3_64 –only ‘pop|ret’</p></blockquote><p>发现了rdi和rsi的，没有找到rdx的。。。</p><p>但是看到rsi的指令里，第一个pop是给了rsi，第二个是给了r15.看了下没别的可以利用的了，那就顺手试试吧=。=</p><pre><code>p1 = padp1+= p64(rdi_addr) + p64(1)p1+= p64(rsi_addr) + p64(write_got) + p64(8) + p64(write_addr)p1+= p64(vuln_addr)</code></pre><p>然后读取到输出的地址，u64后给write_mem</p><h2 id="获取两个地址"><a href="#获取两个地址" class="headerlink" title="获取两个地址"></a>获取两个地址</h2><p>这里和level3一样。两者偏移量是一样的。</p><pre><code>sys_mem =  libc_sym - libc_write + write_memsh_mem = libc_sh - libc_write + write_mem</code></pre><h2 id="执行"><a href="#执行" class="headerlink" title="执行"></a>执行</h2><p>最后就是构造payload了。</p><pre><code>payload = pad + p64(rdi_addr) + p64(sh_mem) + p64(sys_mem)</code></pre><p>测试了下，成功发现了flag，提交正确~</p><p>#总结#<br>两个问题：</p><ol><li>对GOT还是不清楚，包括PLT。现在只是知道动态链接的情况下。got在第一次使用后got会保存内存中的地址，而plt是保存了got的地址。那么为什么还要输出write_got存入到另一半变量write_mem呢？在输出后，直接使用write_mem测试了下不行。这块的内容不清楚。。。</li><li>在write里有三个参数，根据ROPgadget的显示结果，我只是明确利用了两个，第三个是猜的，竟然成功了？这种成功是必然的还是偶然的？</li></ol><p>闲扯两句：<br>不知道安全之后会怎么样，但也觉得现在写代码不多，无论从什么角度来说，多写些代码，多有些经验都不是坏事，还是要多写点东西的，尽量能自动化的就自动化。</p><p>另一个，可能在满足好奇心的情况下，也有了些成就感。越来越觉得二进制挺好玩的，也明白现在只是最初级的阶段，各种保护都是关闭的，嗯。。。继续加油。</p><p>话说，昨天晚上查资料时想起来之前导师给了些资料，看了下范围就是我现在都在迷惑的地方。但看书看资料没刷题爽，这两天还是希望继续刷题，再积累些刷题经验。周末两天好好的啃下资料，扎实基础。</p><p>加油吧~</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;h1 id=&quot;花絮&quot;&gt;&lt;a href=&quot;#花絮&quot; class=&quot;headerlink&quot; title=&quot;花絮&quot;&gt;&lt;/a&gt;花絮&lt;/h1&gt;&lt;p&gt;第一次在没看题解的情况下，独立解题成功？&lt;/p&gt;
+&lt;p&gt;(⊙﹏⊙)连蒙带猜成功了。。。也算成功了。。。吧？。。。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备&lt;/strong&gt;&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/categories/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/categories/Sec/CTF/"/>
+    
+      <category term="PWN" scheme="http://yoursite.com/categories/Sec/CTF/PWN/"/>
+    
+    
+      <category term="Sec" scheme="http://yoursite.com/tags/Sec/"/>
+    
+      <category term="CTF" scheme="http://yoursite.com/tags/CTF/"/>
+    
+      <category term="PWN" scheme="http://yoursite.com/tags/PWN/"/>
+    
+      <category term="JarvisOJ" scheme="http://yoursite.com/tags/JarvisOJ/"/>
+    
+  </entry>
+  
+  <entry>
     <title>JarvisOJ_PWN_level2_64</title>
     <link href="http://yoursite.com/2019/11/19/JarvisOJ-PWN-level2-64/"/>
     <id>http://yoursite.com/2019/11/19/JarvisOJ-PWN-level2-64/</id>
     <published>2019-11-19T13:58:11.000Z</published>
-    <updated>2019-11-19T14:41:08.505Z</updated>
+    <updated>2019-11-20T11:52:00.382Z</updated>
     
-    <content type="html"><![CDATA[<h1 id="花絮"><a href="#花絮" class="headerlink" title="花絮"></a>花絮</h1><p>上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。</p><h1 id="独立解题"><a href="#独立解题" class="headerlink" title="独立解题"></a>独立解题</h1><p>和之前做的Level2差不多。但是这题是64位的。</p><p><strong>前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备</strong></p><a id="more"></a><p>记得64位和32位主要是传参不一样。</p><ul><li>32位传参只要考虑压栈就可以了。</li><li>64位则要考虑到用寄存器。</li></ul><p>使用IDA查看汇编代码：<br>看到:</p><blockquote><p>mov edx,200h</p><p>mov rsi,rax</p><p>mov edi,0</p><p>call _read</p></blockquote><p>猜测，前三个参数应该是分别使用edi、rsi、edx.</p><p>IDA可以找到system函数的地址和’/bin/sh’字符串的地址。那么只要考虑如何把字符串作为参数提供给edi寄存器，然后return到system函数的地址就可以了。</p><p>第一步：最开始期望的是构造出类似这样的语句：</p><blockquote><p>mov edi ‘/bin/sh’</p></blockquote><p>后来想起来，字符串好像不能这样。操控的大多数是代表的地址。这样是行不通的。</p><p>第二步：在0x400555看到代码：</p><blockquote><p>mov edi offset _bss_start</p></blockquote><p>想起来上一题，把’/bin/sh’写入到bss段的方法，但再想想，写入到bss段之前用到了read函数，而read函数需要3个参数，好像工作量并没有减少啊0.0这是换了一个新的问题。</p><p>第三步：想起来level4的两种payload的方法。也就是寻找pop和rnt，找到一个</p><blockquote><p>pop edi </p><p>rnt</p></blockquote><p>这样的代码就可以了。。。然后开始翻IDA<del>（我不知道怎么搜索）</del>没找到0.0</p><p>在0x4006B2处找到一个类似的：</p><blockquote><p>pop r15</p></blockquote><p>但好像又不太对。<br>至此，卡壳。。。去翻了题解。</p><h1 id="解题报告"><a href="#解题报告" class="headerlink" title="解题报告"></a>解题报告</h1><p>学到了还有ROPgadget这个工具。。。</p><p>直接可以用ROPgadget来查找相关字符串</p><blockquote><p>ROPgadget –binary ./level2_64 –string “/bin/sh”<br>这个可以看到’/bin/sh’的地址<br>ROPgadget –binary ./level2_64 –only “pop|ret” 这个可以看到包含pop+ret的字符串和地址</p></blockquote><p>然后发现在0x4006B3的地址上找到了要想要的代码。</p><p><em>咦这个地址看起来有点熟悉啊，和上面那个差了一点啊0.0而且，IDA找不到哎=。=</em></p><p>确定这个后，就很方便构造payload了<br>大致是：</p><blockquote><p>payload = pad + p64(tools_addr) + p64(sh_addr) + p(system_addr)</p></blockquote><p>然后可以cat flag了~</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol><li>64位参数传递约定：前六参数按顺序存储在寄存器里，依次是rdi、rsi、rdx、rcx、r8、r9。第七个及以后会压入栈中。（顺序呢？和32位一样从右往左吗？）</li><li>ROPgadget好厉害，才学到一个词是ROP，面向return编程。之前好像看到过，但没在意，现在感觉很有趣，依然，这个工具不太熟悉，需要熟悉下~</li><li>这个payload是我自己写的，也确实能get到flag。但是，总感觉迷迷糊糊的。说实话，我并不太清楚这个payload传输进去后的执行步骤，当时是想适配一个pop，那把sh_addr压入栈。一个ret，那把system函数地址给过去。但具体怎么样要搞清楚！</li></ol><p>下午没做题有点亏，但办的。。。也算正事。。。吧。。。つ﹏⊂</p><p>这些问题等着明天搞吧，明天要搞清楚~</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
+    <content type="html"><![CDATA[<h1 id="花絮"><a href="#花絮" class="headerlink" title="花絮"></a>花絮</h1><p>上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。</p><h1 id="独立解题"><a href="#独立解题" class="headerlink" title="独立解题"></a>独立解题</h1><p>和之前做的Level2差不多。但是这题是64位的。</p><p><strong>前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备</strong></p><a id="more"></a><p>记得64位和32位主要是传参不一样。</p><ul><li>32位传参只要考虑压栈就可以了。</li><li>64位则要考虑到用寄存器。</li></ul><p>使用IDA查看汇编代码：<br>看到:</p><blockquote><p>mov edx,200h</p><p>mov rsi,rax</p><p>mov edi,0</p><p>call _read</p></blockquote><p>猜测，前三个参数应该是分别使用edi、rsi、edx.</p><p>IDA可以找到system函数的地址和’/bin/sh’字符串的地址。那么只要考虑如何把字符串作为参数提供给edi寄存器，然后return到system函数的地址就可以了。</p><p>第一步：最开始期望的是构造出类似这样的语句：</p><blockquote><p>mov edi ‘/bin/sh’</p></blockquote><p>后来想起来，字符串好像不能这样。操控的大多数是代表的地址。这样是行不通的。</p><p>第二步：在0x400555看到代码：</p><blockquote><p>mov edi offset _bss_start</p></blockquote><p>想起来上一题，把’/bin/sh’写入到bss段的方法，但再想想，写入到bss段之前用到了read函数，而read函数需要3个参数，好像工作量并没有减少啊0.0这是换了一个新的问题。</p><p>第三步：想起来level4的两种payload的方法。也就是寻找pop和rnt，找到一个</p><blockquote><p>pop edi </p><p>rnt</p></blockquote><p>这样的代码就可以了。。。然后开始翻IDA<del>（我不知道怎么搜索）</del>没找到0.0</p><p>在0x4006B2处找到一个类似的：</p><blockquote><p>pop r15</p></blockquote><p>但好像又不太对。<br>至此，卡壳。。。去翻了题解。</p><h1 id="解题报告"><a href="#解题报告" class="headerlink" title="解题报告"></a>解题报告</h1><p>学到了还有ROPgadget这个工具。。。</p><p>直接可以用ROPgadget来查找相关字符串</p><blockquote><p>ROPgadget –binary ./level2_64 –string “/bin/sh”<br>这个可以看到’/bin/sh’的地址<br>ROPgadget –binary ./level2_64 –only “pop|ret” 这个可以看到包含pop+ret的字符串和地址</p></blockquote><p>然后发现在0x4006B3的地址上找到了要想要的代码。</p><p><em>咦这个地址看起来有点熟悉啊，和上面那个差了一点啊0.0而且，IDA找不到哎=。=</em></p><p>确定这个后，就很方便构造payload了<br>大致是：</p><blockquote><p>payload = pad + p64(tools_addr) + p64(sh_addr) + p(system_addr)</p></blockquote><p>然后可以cat flag了~</p><h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol><li>64位参数传递约定：前六参数按顺序存储在寄存器里，依次是rdi、rsi、rdx、rcx、r8、r9。第七个及以后会压入栈中。（<del>顺序呢？和32位一样从右往左吗？</del>顺序和32位的一样，也是从右往左开始，也对，和32位一样也挺好的）</li><li>ROPgadget好厉害，才学到一个词是ROP，面向return编程。之前好像看到过，但没在意，现在感觉很有趣，依然，这个工具不太熟悉，需要熟悉下~</li><li>这个payload是我自己写的，也确实能get到flag。<del>但是，总感觉迷迷糊糊的。说实话，我并不太清楚这个payload传输进去后的执行步骤，当时是想适配一个pop，那把sh_addr压入栈。一个ret，那把system函数地址给过去。但具体怎么样要搞清楚！</del>看了几篇WP加上一些资料，大概算是想通了。首先填充是从低地址往高地址填充的，方向是和扩栈相反。那么，根据payload的设置，首先是一堆pad填充区间。然后栈顶到栈底的顺序，依次是p64(tools_addr)，p64(sh_addr)和p64(system_addr)。先执行第一个，此时tools_addr已经出栈了。执行时发现是个地址跳转到相应位置执行命令（<em>猜的，应该是这样吧。。。</em>）这时栈顶是sh_addr，pop edi就可以把”/bin/sh”给edi寄存器，ret又到了system函数地址，就完成了需要的操作。</li></ol><p>下午没做题有点亏，但办的。。。也算正事。。。吧。。。つ﹏⊂</p><p>这些问题等着明天搞吧，明天要搞清楚~</p><p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>]]></content>
     
     <summary type="html">
     
@@ -734,33 +769,6 @@ java -version &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;看到&lt;/p&gt;
 &lt;p&gt;这种解决方法简单暴力，但是时间复杂度可以达到O(len(S) * len(W))当两个字符串长度乘积较大时会耗时特别长。那么现在考虑优化。&lt;/p&gt;
 &lt;h2 id=&quot;优化一&quot;&gt;&lt;a href=&quot;#优化一&quot; class=&quot;headerlink&quot; title=&quot;优化一&quot;&gt;&lt;/a&gt;优化一&lt;/h2&gt;&lt;p&gt;对于这个问题，我最开始想到的优化方法是，如果能够匹配成功，则主串开始位置字符与模式串首位字符一定相等(即s[i] == w[0])，所以，首先先对主串枚举寻找等于W[0]的位置，将其放入一个list中。然后以list的元素为起始点，开始进行匹配工作。&lt;/p&gt;
 &lt;p&gt;时间复杂度大概为O( num[ w[0] ] * len(W) )，看起来&lt;strong&gt;&lt;em&gt;像&lt;/em&gt;&lt;/strong&gt;是优化的不错，但是很容易发现，这种优化很容易因为S中w[0]数量过多而退化，形如S=”aafaabc”,W=”abc”时，并没有优化多少。&lt;/p&gt;
-    
-    </summary>
-    
-    
-      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
-    
-    
-      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>今天开始，重新学算法啦！</title>
-    <link href="http://yoursite.com/2019/09/16/algorith-contest-0/"/>
-    <id>http://yoursite.com/2019/09/16/algorith-contest-0/</id>
-    <published>2019-09-16T07:31:01.000Z</published>
-    <updated>2019-11-17T13:47:37.539Z</updated>
-    
-    <content type="html"><![CDATA[<h1 id="0-背景"><a href="#0-背景" class="headerlink" title="0. 背景"></a>0. 背景</h1><p>准备认真学习些算法知识，一方面是算法确实很重要也很有趣。另一方面也是为之后找工作可能用到做些准备。</p><p>这算是一个<strong>导航页</strong>，之后会有：</p><ul><li>参加的Codeforces、GCJ、Hiho等<strong>算法竞赛</strong>的记录。</li><li>学习算法时记录、总结的一些小<strong>专题</strong>以方便复习。</li><li>可能有用到些算法的玩具或者小项目。</li></ul><p>希望能写下去吧，菜到写不动也是很可能发生的啊0.0</p><p>加油~</p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;h1 id=&quot;0-背景&quot;&gt;&lt;a href=&quot;#0-背景&quot; class=&quot;headerlink&quot; title=&quot;0. 背景&quot;&gt;&lt;/a&gt;0. 背景&lt;/h1&gt;&lt;p&gt;准备认真学习些算法知识，一方面是算法确实很重要也很有趣。另一方面也是为之后找工作可能用到做些准备。&lt;/p&gt;
-&lt;p&gt;这算是
-      
     
     </summary>
     

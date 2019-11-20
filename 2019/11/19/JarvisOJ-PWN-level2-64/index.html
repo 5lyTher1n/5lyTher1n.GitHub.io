@@ -64,7 +64,7 @@
 <meta property="og:site_name" content="5lyTher1n&#39;s Blog">
 <meta property="og:description" content="花絮上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。 独立解题和之前做的Level2差不多。但是这题是64位的。 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-19T14:41:08.505Z">
+<meta property="og:updated_time" content="2019-11-20T11:52:00.382Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JarvisOJ_PWN_level2_64">
 <meta name="twitter:description" content="花絮上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。 独立解题和之前做的Level2差不多。但是这题是64位的。 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
@@ -285,11 +285,19 @@
                 
               
 
-              <time title="创建时间：2019-11-19 21:58:11 / 修改时间：22:41:08" itemprop="dateCreated datePublished" datetime="2019-11-19T21:58:11+08:00">2019-11-19</time>
+              <time title="创建时间：2019-11-19 21:58:11" itemprop="dateCreated datePublished" datetime="2019-11-19T21:58:11+08:00">2019-11-19</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-20 19:52:00" itemprop="dateModified" datetime="2019-11-20T19:52:00+08:00">2019-11-20</time>
+              </span>
             
           
             <span class="post-meta-item">
@@ -384,9 +392,9 @@
 </blockquote>
 <p>然后可以cat flag了~</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><ol>
-<li>64位参数传递约定：前六参数按顺序存储在寄存器里，依次是rdi、rsi、rdx、rcx、r8、r9。第七个及以后会压入栈中。（顺序呢？和32位一样从右往左吗？）</li>
+<li>64位参数传递约定：前六参数按顺序存储在寄存器里，依次是rdi、rsi、rdx、rcx、r8、r9。第七个及以后会压入栈中。（<del>顺序呢？和32位一样从右往左吗？</del>顺序和32位的一样，也是从右往左开始，也对，和32位一样也挺好的）</li>
 <li>ROPgadget好厉害，才学到一个词是ROP，面向return编程。之前好像看到过，但没在意，现在感觉很有趣，依然，这个工具不太熟悉，需要熟悉下~</li>
-<li>这个payload是我自己写的，也确实能get到flag。但是，总感觉迷迷糊糊的。说实话，我并不太清楚这个payload传输进去后的执行步骤，当时是想适配一个pop，那把sh_addr压入栈。一个ret，那把system函数地址给过去。但具体怎么样要搞清楚！</li>
+<li>这个payload是我自己写的，也确实能get到flag。<del>但是，总感觉迷迷糊糊的。说实话，我并不太清楚这个payload传输进去后的执行步骤，当时是想适配一个pop，那把sh_addr压入栈。一个ret，那把system函数地址给过去。但具体怎么样要搞清楚！</del>看了几篇WP加上一些资料，大概算是想通了。首先填充是从低地址往高地址填充的，方向是和扩栈相反。那么，根据payload的设置，首先是一堆pad填充区间。然后栈顶到栈底的顺序，依次是p64(tools_addr)，p64(sh_addr)和p64(system_addr)。先执行第一个，此时tools_addr已经出栈了。执行时发现是个地址跳转到相应位置执行命令（<em>猜的，应该是这样吧。。。</em>）这时栈顶是sh_addr，pop edi就可以把”/bin/sh”给edi寄存器，ret又到了system函数地址，就完成了需要的操作。</li>
 </ol>
 <p>下午没做题有点亏，但办的。。。也算正事。。。吧。。。つ﹏⊂</p>
 <p>这些问题等着明天搞吧，明天要搞清楚~</p>
@@ -431,6 +439,10 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/11/20/JarvisOJ-PWN-Level3-x64/" rel="prev" title="JarvisOJ_PWN_Level3_x64">
+                  JarvisOJ_PWN_Level3_x64 <i class="fa fa-chevron-right"></i>
+                </a>
               
             </div>
           </div>
@@ -497,7 +509,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">21</span>
+          <span class="site-state-item-count">22</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
