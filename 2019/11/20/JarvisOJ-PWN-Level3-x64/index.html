@@ -64,7 +64,7 @@
 <meta property="og:site_name" content="5lyTher1n&#39;s Blog">
 <meta property="og:description" content="花絮第一次在没看题解的情况下，独立解题成功？ (⊙﹏⊙)连蒙带猜成功了。。。也算成功了。。。吧？。。。 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-20T12:25:08.948Z">
+<meta property="og:updated_time" content="2019-11-21T11:42:03.661Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JarvisOJ_PWN_Level3_x64">
 <meta name="twitter:description" content="花絮第一次在没看题解的情况下，独立解题成功？ (⊙﹏⊙)连蒙带猜成功了。。。也算成功了。。。吧？。。。 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
@@ -285,11 +285,19 @@
                 
               
 
-              <time title="创建时间：2019-11-20 19:43:28 / 修改时间：20:25:08" itemprop="dateCreated datePublished" datetime="2019-11-20T19:43:28+08:00">2019-11-20</time>
+              <time title="创建时间：2019-11-20 19:43:28" itemprop="dateCreated datePublished" datetime="2019-11-20T19:43:28+08:00">2019-11-20</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-21 19:42:03" itemprop="dateModified" datetime="2019-11-21T19:42:03+08:00">2019-11-21</time>
+              </span>
             
           
             <span class="post-meta-item">
@@ -358,7 +366,7 @@ sh_mem = libc_sh - libc_write + write_mem</code></pre><h2 id="执行"><a href="#
 <p>#总结#<br>两个问题：</p>
 <ol>
 <li>对GOT还是不清楚，包括PLT。现在只是知道动态链接的情况下。got在第一次使用后got会保存内存中的地址，而plt是保存了got的地址。那么为什么还要输出write_got存入到另一半变量write_mem呢？在输出后，直接使用write_mem测试了下不行。这块的内容不清楚。。。</li>
-<li>在write里有三个参数，根据ROPgadget的显示结果，我只是明确利用了两个，第三个是猜的，竟然成功了？这种成功是必然的还是偶然的？</li>
+<li>在write里有三个参数，根据ROPgadget的显示结果，我只是明确利用了两个，第三个是猜的，竟然成功了？这种成功是必然的还是偶然的？（11.21留：可以通过gdb来查看运行过程中各个寄存器的量。这里因为rdx上次使用时在调用函数时赋值了0x200.所以，对于这个程序，可以不考虑rdx的赋值。）</li>
 </ol>
 <p>闲扯两句：<br>不知道安全之后会怎么样，但也觉得现在写代码不多，无论从什么角度来说，多写些代码，多有些经验都不是坏事，还是要多写点东西的，尽量能自动化的就自动化。</p>
 <p>另一个，可能在满足好奇心的情况下，也有了些成就感。越来越觉得二进制挺好玩的，也明白现在只是最初级的阶段，各种保护都是关闭的，嗯。。。继续加油。</p>
@@ -405,6 +413,10 @@ sh_mem = libc_sh - libc_write + write_mem</code></pre><h2 id="执行"><a href="#
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2019/11/21/JarvisOJ-PWN-Level5/" rel="prev" title="JarvisOJ_PWN_Level5">
+                  JarvisOJ_PWN_Level5 <i class="fa fa-chevron-right"></i>
+                </a>
               
             </div>
           </div>
@@ -471,7 +483,7 @@ sh_mem = libc_sh - libc_write + write_mem</code></pre><h2 id="执行"><a href="#
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

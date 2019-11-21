@@ -64,7 +64,7 @@
 <meta property="og:site_name" content="5lyTher1n&#39;s Blog">
 <meta property="og:description" content="花絮上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。 独立解题和之前做的Level2差不多。但是这题是64位的。 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-20T11:52:00.382Z">
+<meta property="og:updated_time" content="2019-11-21T11:44:59.333Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JarvisOJ_PWN_level2_64">
 <meta name="twitter:description" content="花絮上午上课时写的，下午在折腾之前捡的垃圾。好像，今天的进度被拉跨了。。。 独立解题和之前做的Level2差不多。但是这题是64位的。 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
@@ -296,7 +296,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-11-20 19:52:00" itemprop="dateModified" datetime="2019-11-20T19:52:00+08:00">2019-11-20</time>
+                <time title="修改时间：2019-11-21 19:44:59" itemprop="dateModified" datetime="2019-11-21T19:44:59+08:00">2019-11-21</time>
               </span>
             
           
@@ -386,6 +386,9 @@
 </blockquote>
 <p>然后发现在0x4006B3的地址上找到了要想要的代码。</p>
 <p><em>咦这个地址看起来有点熟悉啊，和上面那个差了一点啊0.0而且，IDA找不到哎=。=</em></p>
+<blockquote>
+<p>(11.21留:今天看到一个题解说到了这个点：<br>pop r15，retn的字节码是：<br>0x41 0x5f 0xc3<br>    而pop rdi,ret的字节码是：<br>    0x5f 0xc3<br>    所以，可以从r15处取得rdi）太有趣啦~有逻辑性又有戏剧性</p>
+</blockquote>
 <p>确定这个后，就很方便构造payload了<br>大致是：</p>
 <blockquote>
 <p>payload = pad + p64(tools_addr) + p64(sh_addr) + p(system_addr)</p>
@@ -509,7 +512,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">22</span>
+          <span class="site-state-item-count">23</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
