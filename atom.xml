@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://yoursite.com/"/>
-  <updated>2019-11-22T15:50:17.770Z</updated>
+  <updated>2020-05-19T14:47:30.514Z</updated>
   <id>http://yoursite.com/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>为期一年的日记</title>
+    <link href="http://yoursite.com/2021/06/21/One-year-diary/"/>
+    <id>http://yoursite.com/2021/06/21/One-year-diary/</id>
+    <published>2021-06-21T14:27:24.000Z</published>
+    <updated>2020-05-19T14:47:30.514Z</updated>
+    
+    <content type="html"><![CDATA[<h1 id="2020年5月19日，第0天"><a href="#2020年5月19日，第0天" class="headerlink" title="2020年5月19日，第0天"></a>2020年5月19日，第0天</h1><p>其实应该是写做第一天，但是，听起来明天好像更好记？那么。。。从零数就是了，So</p><p>写了一天爬虫和小脚本，确切的说应该是写了半天，剩下半天都在搞网，实验室的网络总是莫名其妙的就断了。。。排查一下午依然没好，后来去吃个饭回来再试又好了，莫名奇妙的崩，莫名其妙的好。。。</p><p>尽管爬虫和其他的一些脚本写的也很逊，没考虑优化没考虑效率，只是勉强能完成工作需求。<em>(莫名其妙的转折)</em> 但是还是觉得要好好学下<strong>[正则]</strong>，有点算是刚需了。</p><p>明天的计划：</p><ol><li>把剩余的一些表格做完，这样明天或者后天可以整理交上去。对应文件也可以用之前的两个脚本修改下完成，时间上应该不会耗很久。</li><li>Sqli-labs 大致过一遍，能过多少过多少，sqli尽管不那么常见了，但还是想系统的学习下。</li><li>收藏夹里的正则看下，修改下爬虫，整理一个正则版的。</li><li>搭下XSS的靶场。</li></ol><p>尽量办吧~</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h1 id=&quot;2020年5月19日，第0天&quot;&gt;&lt;a href=&quot;#2020年5月19日，第0天&quot; class=&quot;headerlink&quot; title=&quot;2020年5月19日，第0天&quot;&gt;&lt;/a&gt;2020年5月19日，第0天&lt;/h1&gt;&lt;p&gt;其实应该是写做第一天，但是，听起来明天好像更
+      
+    
+    </summary>
+    
+    
+      <category term="杂项" scheme="http://yoursite.com/categories/%E6%9D%82%E9%A1%B9/"/>
+    
+    
+      <category term="杂项" scheme="http://yoursite.com/tags/%E6%9D%82%E9%A1%B9/"/>
+    
+  </entry>
   
   <entry>
     <title>JarvisOJ_PWN_Level5</title>
@@ -749,40 +775,6 @@ java -version &lt;/code&gt;&lt;/pre&gt;&lt;p&gt;看到&lt;/p&gt;
       <category term="Sec" scheme="http://yoursite.com/tags/Sec/"/>
     
       <category term="Tools" scheme="http://yoursite.com/tags/Tools/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>&lt;Leetcode 28&gt;. Implement strStr()</title>
-    <link href="http://yoursite.com/2019/09/19/Leetcode-28-kmp/"/>
-    <id>http://yoursite.com/2019/09/19/Leetcode-28-kmp/</id>
-    <published>2019-09-19T10:39:15.000Z</published>
-    <updated>2019-11-17T13:47:37.539Z</updated>
-    
-    <content type="html"><![CDATA[<p><a href="https://leetcode.com/problems/implement-strstr/" title="[28. Implement strStr() 题目链接]" target="_blank" rel="noopener">题目链接</a></p><p>算是比较直接简单的模板题。</p><p>直接简单修改<a href="https://5lyther1n.github.io/2019/09/18/kmp0/#more" title="KMP算法学习笔记" target="_blank" rel="noopener">KMP算法学习笔记</a>后附的代码段落就可以了。</p><pre><code>class Solution {public:    vector&lt;int&gt; getNext(string n) {        int len = n.size();        vector&lt;int&gt; next(len+1,0) ;        int i,j;        next[0] = -1;        i = 0,j = 0;        while(i &lt; len){            if(j == -1 || n[i] == n[j]){                ++ i;                ++ j;                next[i] = j;            }            else j = next[j];        }        return next;    }    int strStr(string h, string n) {        if(n.size() == 0) return 0;        int i,j,lenh,lenn;        lenh = h.size();        lenn = n.size();        i = 0,j = 0;        vector&lt;int&gt; next = getNext(n);        while(i &lt; lenh &amp;&amp; j &lt; lenn){            if(j == -1 || h[i] == n[j]){                ++ i;                ++ j;            }            else j = next[j];        }        if(j == lenn)return i-j;        return -1;   }};Accepted    8 ms    9.4 MB    cpp</code></pre><p><em>bin神的模板代码感觉是不错，可我的代码风格感觉没那么简洁0.0，哎，<del>~ 扶脑壳 ~</del></em></p><p><em>(PS:好像这个主题默认不能使用方括号作为标题啊0.0)</em></p>]]></content>
-    
-    <summary type="html">
-    
-      
-      
-        &lt;p&gt;&lt;a href=&quot;https://leetcode.com/problems/implement-strstr/&quot; title=&quot;[28. Implement strStr() 题目链接]&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;题目链接&lt;/a&gt;&lt;/
-      
-    
-    </summary>
-    
-    
-      <category term="algorithms" scheme="http://yoursite.com/categories/algorithms/"/>
-    
-      <category term="算法习题" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/"/>
-    
-      <category term="Leetcode" scheme="http://yoursite.com/categories/algorithms/%E7%AE%97%E6%B3%95%E4%B9%A0%E9%A2%98/Leetcode/"/>
-    
-    
-      <category term="algorithms" scheme="http://yoursite.com/tags/algorithms/"/>
-    
-      <category term="Leetcode" scheme="http://yoursite.com/tags/Leetcode/"/>
-    
-      <category term="KMP" scheme="http://yoursite.com/tags/KMP/"/>
     
   </entry>
   
